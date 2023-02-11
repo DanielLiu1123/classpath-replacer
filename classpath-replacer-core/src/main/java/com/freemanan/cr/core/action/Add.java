@@ -1,17 +1,14 @@
 package com.freemanan.cr.core.action;
 
-import static com.freemanan.cr.core.util.Const.*;
+import static com.freemanan.cr.core.util.Const.MAVEN_COORDINATE_WITH_VERSION_PATTERN;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Freeman
  */
 public class Add {
-    private static final Logger log = LoggerFactory.getLogger(Add.class);
 
     private final List<String> coordinates = new ArrayList<>();
 
@@ -27,7 +24,7 @@ public class Add {
             if (coordinate.matches(MAVEN_COORDINATE_WITH_VERSION_PATTERN)) {
                 validCoordinates.add(coordinate);
             } else {
-                log.warn("Invalid maven coordinate: {}", coordinate);
+                throw new IllegalArgumentException("Invalid maven coordinate: " + coordinate);
             }
         }
         Add add = new Add();

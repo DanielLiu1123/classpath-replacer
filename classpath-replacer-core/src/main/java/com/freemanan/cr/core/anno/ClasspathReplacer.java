@@ -10,9 +10,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 /**
  * {@link ClasspathReplacer} is used to replace the classpath with the given actions.
  *
- * <p> This operation is performed in order, so if there are multiple operations, you need to pay attention to the order.
+ * <p>
+ * This operation is performed in order, so if there are multiple operations, you need to pay attention to the order.
  *
- * <p> For example:
+ * <p>
+ * For example:
  * <pre>{@code
  * ClasspathReplacer({
  *     @Action(action = EXCLUDE, value = "slf4j-log4j12-*.jar"),
@@ -21,6 +23,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
  * class SomeTest {}
  * }</pre>
  * <p> This will exclude the {@code slf4j-log4j12} first then add the {@code logback-classic} jar.
+ *
+ * <p>
+ * When add new dependencies, there may be dependency conflicts. For example, the log framework used by the current program is {@code logback}, and the added dependency using {@code log4j}.
+ * Therefore, in complex scenarios, the ability to define the order of actions is a very important feature.
  *
  * @author Freeman
  */

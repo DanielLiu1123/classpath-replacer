@@ -1,6 +1,6 @@
 package com.freemanan.cr.core.util;
 
-import static com.freemanan.cr.core.anno.Action.Type.ADD;
+import static com.freemanan.cr.core.anno.Action.Verb.ADD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
  * @author Freeman
  */
 @ClasspathReplacer({
-    @Action(action = ADD, value = "com.google.code.gson:gson:2.9.0"),
+    @Action(verb = ADD, value = "com.google.code.gson:gson:2.9.0"),
 })
 class ModifiedClassLoaderCacheTest {
 
@@ -56,7 +56,7 @@ class ModifiedClassLoaderCacheTest {
     @Test
     @Order(3)
     @ClasspathReplacer({
-        @Action(action = ADD, value = "com.google.code.gson:gson:2.9.0"),
+        @Action(verb = ADD, value = "com.google.code.gson:gson:2.9.0"),
     })
     void test3() {
         // different class loader
@@ -74,7 +74,7 @@ class ModifiedClassLoaderCacheTest {
     @Test
     @Order(4)
     @ClasspathReplacer({
-        @Action(action = ADD, value = "com.google.code.gson:gson:2.9.0"),
+        @Action(verb = ADD, value = "com.google.code.gson:gson:2.9.0"),
     })
     void test4() {
         // different class loader

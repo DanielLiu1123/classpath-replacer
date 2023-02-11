@@ -1,5 +1,8 @@
 dependencies {
     testImplementation(project(":classpath-replacer-junit5"))
 
+    compileOnly("com.fasterxml.jackson.core:jackson-databind:2.14.1")
+    compileOnly("com.google.code.gson:gson:2.10.1")
+
     testImplementation("ch.qos.logback:logback-classic:1.4.5")
 }

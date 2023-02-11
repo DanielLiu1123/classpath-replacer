@@ -1,8 +1,8 @@
 package com.freemanan.cr.core.junit5;
 
-import static com.freemanan.cr.core.anno.Action.Type.ADD;
-import static com.freemanan.cr.core.anno.Action.Type.EXCLUDE;
-import static com.freemanan.cr.core.anno.Action.Type.OVERRIDE;
+import static com.freemanan.cr.core.anno.Action.Verb.ADD;
+import static com.freemanan.cr.core.anno.Action.Verb.EXCLUDE;
+import static com.freemanan.cr.core.anno.Action.Verb.OVERRIDE;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -19,10 +19,10 @@ import org.junit.jupiter.api.Test;
  * @author Freeman
  */
 @ClasspathReplacer({
-    @Action(action = ADD, value = "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.5"),
-    @Action(action = ADD, value = "com.google.code.gson:gson:2.8.9"),
-    @Action(action = OVERRIDE, value = "com.google.code.gson:gson:2.9.0"),
-    @Action(action = EXCLUDE, value = "gson-2.9.0.jar"),
+    @Action(verb = ADD, value = "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.5"),
+    @Action(verb = ADD, value = "com.google.code.gson:gson:2.8.9"),
+    @Action(verb = OVERRIDE, value = "com.google.code.gson:gson:2.9.0"),
+    @Action(verb = EXCLUDE, value = "gson-2.9.0.jar"),
 })
 class Junit5Test {
 

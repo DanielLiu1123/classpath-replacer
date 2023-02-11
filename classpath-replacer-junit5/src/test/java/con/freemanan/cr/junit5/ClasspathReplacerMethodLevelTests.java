@@ -1,8 +1,8 @@
 package con.freemanan.cr.junit5;
 
-import static com.freemanan.cr.core.anno.Action.Type.ADD;
-import static com.freemanan.cr.core.anno.Action.Type.EXCLUDE;
-import static com.freemanan.cr.core.anno.Action.Type.OVERRIDE;
+import static com.freemanan.cr.core.anno.Action.Verb.ADD;
+import static com.freemanan.cr.core.anno.Action.Verb.EXCLUDE;
+import static com.freemanan.cr.core.anno.Action.Verb.OVERRIDE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
@@ -11,9 +11,9 @@ import com.freemanan.cr.core.anno.ClasspathReplacer;
 import org.junit.jupiter.api.Test;
 
 @ClasspathReplacer({
-    @Action(action = ADD, value = "org.springframework.boot:spring-boot:2.7.0"),
-    @Action(action = OVERRIDE, value = "org.springframework.boot:spring-boot:3.0.0"),
-    @Action(action = EXCLUDE, value = "spring-boot-3.0.0.jar"),
+    @Action(verb = ADD, value = "org.springframework.boot:spring-boot:2.7.0"),
+    @Action(verb = OVERRIDE, value = "org.springframework.boot:spring-boot:3.0.0"),
+    @Action(verb = EXCLUDE, value = "spring-boot-3.0.0.jar"),
 })
 public class ClasspathReplacerMethodLevelTests {
 
@@ -27,7 +27,7 @@ public class ClasspathReplacerMethodLevelTests {
 
     @Test
     @ClasspathReplacer({
-        @Action(action = ADD, value = "org.springframework.boot:spring-boot:3.0.0"),
+        @Action(verb = ADD, value = "org.springframework.boot:spring-boot:3.0.0"),
     })
     void testVersionIs300_whenAdd300() throws Exception {
         Class<?> sbv = Class.forName("org.springframework.boot.SpringBootVersion");

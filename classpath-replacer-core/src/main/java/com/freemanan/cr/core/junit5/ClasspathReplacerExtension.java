@@ -110,11 +110,11 @@ public class ClasspathReplacerExtension implements InvocationInterceptor {
         Action[] actions = cr.value();
         ModifiedClassPathClassLoaderGenerator generator = ModifiedClassPathClassLoaderGenerator.of(originalClassLoader);
         for (Action action : actions) {
-            switch (action.action()) {
+            switch (action.verb()) {
                 case ADD -> generator.add(action.value());
                 case EXCLUDE -> generator.exclude(action.value());
                 case OVERRIDE -> generator.override(action.value());
-                default -> throw new IllegalStateException("Unexpected value: " + action.action());
+                default -> throw new IllegalStateException("Unexpected value: " + action.verb());
             }
         }
         return generator.gen();

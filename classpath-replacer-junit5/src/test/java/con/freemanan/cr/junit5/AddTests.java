@@ -1,6 +1,6 @@
 package con.freemanan.cr.junit5;
 
-import static com.freemanan.cr.core.anno.Action.Type.ADD;
+import static com.freemanan.cr.core.anno.Action.Verb.ADD;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -10,7 +10,7 @@ import com.freemanan.cr.core.anno.ClasspathReplacer;
 import org.junit.jupiter.api.Test;
 
 @ClasspathReplacer({
-    @Action(action = ADD, value = "com.google.code.gson:gson:2.9.0"),
+    @Action(verb = ADD, value = "com.google.code.gson:gson:2.9.0"),
 })
 public class AddTests {
 

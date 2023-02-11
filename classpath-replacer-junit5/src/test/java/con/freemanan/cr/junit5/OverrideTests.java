@@ -1,7 +1,7 @@
 package con.freemanan.cr.junit5;
 
-import static com.freemanan.cr.core.anno.Action.Type.ADD;
-import static com.freemanan.cr.core.anno.Action.Type.OVERRIDE;
+import static com.freemanan.cr.core.anno.Action.Verb.ADD;
+import static com.freemanan.cr.core.anno.Action.Verb.OVERRIDE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.freemanan.cr.core.anno.Action;
@@ -12,8 +12,8 @@ import org.junit.jupiter.api.Test;
  * @author Freeman
  */
 @ClasspathReplacer({
-    @Action(action = ADD, value = "org.springframework.boot:spring-boot:2.7.0"),
-    @Action(action = OVERRIDE, value = "org.springframework.boot:spring-boot:3.0.0"),
+    @Action(verb = ADD, value = "org.springframework.boot:spring-boot:2.7.0"),
+    @Action(verb = OVERRIDE, value = "org.springframework.boot:spring-boot:3.0.0"),
 })
 public class OverrideTests {
 
