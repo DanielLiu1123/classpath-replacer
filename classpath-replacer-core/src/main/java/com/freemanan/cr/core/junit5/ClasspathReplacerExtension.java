@@ -1,9 +1,10 @@
 package com.freemanan.cr.core.junit5;
 
-import com.freemanan.cr.core.ClassLoaderModifier;
 import com.freemanan.cr.core.ModifiedClassPathClassLoader;
+import com.freemanan.cr.core.ModifiedClassPathClassLoaderGenerator;
 import com.freemanan.cr.core.anno.Action;
 import com.freemanan.cr.core.anno.ClasspathReplacer;
+import com.freemanan.cr.core.util.ModifiedClassLoaderCache;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
@@ -81,31 +82,42 @@ public class ClasspathReplacerExtension implements InvocationInterceptor {
         Method testMethod = invocationContext.getExecutable();
         ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
 
-        // TODO: cache
-        //        URLClassLoader modifiedClassLoader = ModifiedClassPathClassLoader.get(testClass);
+        // We only cache Class -> ClassLoader, because the ClassLoader may be different for different test methods
+        ModifiedClassPathClassLoader customizedClassLoader = Optional.ofNullable(
+                        testMethod.getAnnotation(ClasspathReplacer.class))
+                .map(cr -> getModifiedClassLoader(cr, originalClassLoader))
+                .orElse(getCachedClassLevelClassLoader(testClass, originalClassLoader));
 
-        ClasspathReplacer cr = Optional.ofNullable(testMethod.getAnnotation(ClasspathReplacer.class))
-                .orElse(testClass.getAnnotation(ClasspathReplacer.class));
-        assert cr != null;
-
-        Action[] actions = cr.value();
-        ClassLoaderModifier modifier = ClassLoaderModifier.of(originalClassLoader);
-        for (Action action : actions) {
-            switch (action.action()) {
-                case ADD -> modifier.add(action.value());
-                case EXCLUDE -> modifier.exclude(action.value());
-                case OVERRIDE -> modifier.override(action.value());
-                default -> throw new IllegalStateException("Unexpected value: " + action.action());
-            }
-        }
-        ClassLoader custmizedClassLoader = modifier.gen();
-
-        Thread.currentThread().setContextClassLoader(custmizedClassLoader);
+        Thread.currentThread().setContextClassLoader(customizedClassLoader);
         try {
-            runTest(testClass.getName(), testMethod.getName(), custmizedClassLoader);
+            runTest(testClass.getName(), testMethod.getName(), customizedClassLoader);
         } finally {
             Thread.currentThread().setContextClassLoader(originalClassLoader);
         }
+    }
+
+    private static ModifiedClassPathClassLoader getCachedClassLevelClassLoader(
+            Class<?> testClass, ClassLoader originalClassLoader) {
+        return ModifiedClassLoaderCache.getOrPut(testClass, () -> {
+            ClasspathReplacer cr = testClass.getAnnotation(ClasspathReplacer.class);
+            return getModifiedClassLoader(cr, originalClassLoader);
+        });
+    }
+
+    private static ModifiedClassPathClassLoader getModifiedClassLoader(
+            ClasspathReplacer cr, ClassLoader originalClassLoader) {
+        assert cr != null;
+        Action[] actions = cr.value();
+        ModifiedClassPathClassLoaderGenerator generator = ModifiedClassPathClassLoaderGenerator.of(originalClassLoader);
+        for (Action action : actions) {
+            switch (action.action()) {
+                case ADD -> generator.add(action.value());
+                case EXCLUDE -> generator.exclude(action.value());
+                case OVERRIDE -> generator.override(action.value());
+                default -> throw new IllegalStateException("Unexpected value: " + action.action());
+            }
+        }
+        return generator.gen();
     }
 
     private void runTest(String testClassName, String testMethodName, ClassLoader custmizedClassLoader)

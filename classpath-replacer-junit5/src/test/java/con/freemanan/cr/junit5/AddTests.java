@@ -9,9 +9,6 @@ import com.freemanan.cr.core.anno.Action;
 import com.freemanan.cr.core.anno.ClasspathReplacer;
 import org.junit.jupiter.api.Test;
 
-/**
- * @author Freeman
- */
 @ClasspathReplacer({
     @Action(action = ADD, value = "com.google.code.gson:gson:2.9.0"),
 })

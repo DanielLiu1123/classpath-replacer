@@ -39,7 +39,7 @@ import org.eclipse.aether.transport.http.HttpTransporterFactory;
 /**
  * @author Freeman
  */
-public class ClassLoaderModifier {
+public class ModifiedClassPathClassLoaderGenerator {
     private final List<Object> actions = new LinkedList<>();
 
     private static final Pattern INTELLIJ_CLASSPATH_JAR_PATTERN = Pattern.compile(".*classpath(\\d+)?\\.jar");
@@ -47,30 +47,30 @@ public class ClassLoaderModifier {
 
     private final ClassLoader parent;
 
-    private ClassLoaderModifier(ClassLoader parent) {
+    private ModifiedClassPathClassLoaderGenerator(ClassLoader parent) {
         this.parent = parent;
     }
 
-    public static ClassLoaderModifier of(ClassLoader parent) {
-        return new ClassLoaderModifier(parent);
+    public static ModifiedClassPathClassLoaderGenerator of(ClassLoader parent) {
+        return new ModifiedClassPathClassLoaderGenerator(parent);
     }
 
-    public ClassLoaderModifier exclude(String... patterns) {
+    public ModifiedClassPathClassLoaderGenerator exclude(String... patterns) {
         actions.add(Exclude.of(patterns));
         return this;
     }
 
-    public ClassLoaderModifier add(String... coordinates) {
+    public ModifiedClassPathClassLoaderGenerator add(String... coordinates) {
         actions.add(Add.of(coordinates));
         return this;
     }
 
-    public ClassLoaderModifier override(String... coordinates) {
+    public ModifiedClassPathClassLoaderGenerator override(String... coordinates) {
         actions.add(Override.of(coordinates));
         return this;
     }
 
-    public ClassLoader gen() {
+    public ModifiedClassPathClassLoader gen() {
         URL[] urls = extractUrls(parent);
         List<URL> result = Arrays.stream(urls).collect(Collectors.toList());
         actions.forEach(action -> {
@@ -135,7 +135,7 @@ public class ClassLoaderModifier {
             return Stream.of(urlClassLoader.getURLs());
         }
         return Stream.of(ManagementFactory.getRuntimeMXBean().getClassPath().split(File.pathSeparator))
-                .map(ClassLoaderModifier::toURL);
+                .map(ModifiedClassPathClassLoaderGenerator::toURL);
     }
 
     private static URL toURL(String entry) {
@@ -198,7 +198,6 @@ public class ClassLoaderModifier {
     private static List<URL> resolveCoordinates(String[] coordinates) {
         Exception latestFailure = null;
 
-        // change deprecated code
         DefaultServiceLocator serviceLocator = MavenRepositorySystemUtils.newServiceLocator();
         serviceLocator.addService(RepositoryConnectorFactory.class, BasicRepositoryConnectorFactory.class);
         serviceLocator.addService(TransporterFactory.class, HttpTransporterFactory.class);
