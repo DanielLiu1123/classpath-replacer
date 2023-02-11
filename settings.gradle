@@ -1,0 +1,8 @@
+rootProject.name = 'classpath-replacer'
+
+include(":classpath-replacer-core")
+include(":classpath-replacer-junit5")
+include(":classpath-replacer-testng")
+
+include(":examples:junit5")
+

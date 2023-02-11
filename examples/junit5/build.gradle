@@ -1,0 +1,5 @@
+dependencies {
+    testImplementation(project(":classpath-replacer-junit5"))
+
+    testImplementation("ch.qos.logback:logback-classic:1.4.5")
+}

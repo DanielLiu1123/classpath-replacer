@@ -1,0 +1,20 @@
+dependencies {
+    // core
+    api("org.apache.maven:maven-resolver-provider:${mavenVerson}") {
+        exclude(group: "javax.inject", module: "javax.inject")
+    }
+    api("org.apache.maven.resolver:maven-resolver-connector-basic:${mavenResolverVersion}")
+    api("org.apache.maven.resolver:maven-resolver-transport-http:${mavenResolverVersion}")
+
+    // Junit5
+    compileOnly(platform("org.junit:junit-bom:${junit5Version}"))
+    compileOnly("org.junit.jupiter:junit-jupiter-api")
+    compileOnly("org.junit.platform:junit-platform-launcher")
+
+
+
+    // For testing
+    testImplementation(platform("org.junit:junit-bom:${junit5Version}"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.junit.platform:junit-platform-launcher")
+}

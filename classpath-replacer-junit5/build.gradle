@@ -1,0 +1,10 @@
+dependencies {
+    api(platform("org.junit:junit-bom:${junit5Version}"))
+
+    api(project(":classpath-replacer-core"))
+
+    api("org.junit.jupiter:junit-jupiter")
+    api("org.junit.platform:junit-platform-launcher")
+
+    testImplementation("ch.qos.logback:logback-classic:1.4.5")
+}
