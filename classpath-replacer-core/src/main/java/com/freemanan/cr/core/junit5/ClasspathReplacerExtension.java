@@ -86,7 +86,7 @@ public class ClasspathReplacerExtension implements InvocationInterceptor {
         ModifiedClassPathClassLoader customizedClassLoader = Optional.ofNullable(
                         testMethod.getAnnotation(ClasspathReplacer.class))
                 .map(cr -> getModifiedClassLoader(cr, originalClassLoader))
-                .orElse(getCachedClassLevelClassLoader(testClass, originalClassLoader));
+                .orElseGet(() -> getCachedClassLevelClassLoader(testClass, originalClassLoader));
 
         Thread.currentThread().setContextClassLoader(customizedClassLoader);
         try {
