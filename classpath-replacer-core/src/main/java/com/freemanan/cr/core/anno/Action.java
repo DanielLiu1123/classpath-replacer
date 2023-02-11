@@ -10,7 +10,6 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-// @Repeatable(ClasspathReplacer.class)
 public @interface Action {
 
     String[] value();
