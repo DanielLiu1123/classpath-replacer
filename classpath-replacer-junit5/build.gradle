@@ -8,3 +8,5 @@ dependencies {
 
     testImplementation("ch.qos.logback:logback-classic:1.4.5")
 }
+
+apply from: "$rootDir/deploy.gradle"
