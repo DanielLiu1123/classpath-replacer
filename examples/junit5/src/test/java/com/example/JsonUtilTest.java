@@ -16,20 +16,20 @@ class JsonUtilTest {
 
     @Test
     void testNoJsonImplementationOnClasspath() {
-        assertThrows(ExceptionInInitializerError.class, JsonUtil::get);
+        assertThrows(ExceptionInInitializerError.class, JsonUtil::instance);
     }
 
     @Test
     @ClasspathReplacer(@Action(verb = ADD, value = "com.google.code.gson:gson:2.10.1"))
     void testGsonOnClasspath() {
-        assertTrue(JsonUtil.get() instanceof Gson);
+        assertTrue(JsonUtil.instance() instanceof Gson);
         assertEquals("{}", JsonUtil.toJson(new Object()));
     }
 
     @Test
     @ClasspathReplacer(@Action(verb = ADD, value = "com.fasterxml.jackson.core:jackson-databind:2.14.1"))
     void testJacksonOnClasspath() {
-        assertTrue(JsonUtil.get() instanceof Jackson);
+        assertTrue(JsonUtil.instance() instanceof Jackson);
     }
 
     @Test
@@ -38,7 +38,7 @@ class JsonUtilTest {
         @Action(verb = ADD, value = "com.google.code.gson:gson:2.10.1")
     })
     void useJacksonFirst_whenBothJacksonAndGsonOnClasspath() {
-        assertTrue(JsonUtil.get() instanceof Jackson);
+        assertTrue(JsonUtil.instance() instanceof Jackson);
     }
 
     @Test

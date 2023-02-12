@@ -38,7 +38,7 @@ public class JsonUtil {
         }
     }
 
-    public static JSON get() {
+    public static JSON instance() {
         return json;
     }
 }
