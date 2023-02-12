@@ -1,6 +1,6 @@
 package com.freemanan.cr.core.anno;
 
-import com.freemanan.cr.core.junit5.ClasspathReplacerExtension;
+import com.freemanan.cr.core.framework.junit5.ClasspathReplacerExtension;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

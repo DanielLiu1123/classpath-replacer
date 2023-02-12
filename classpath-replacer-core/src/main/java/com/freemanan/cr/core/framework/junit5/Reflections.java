@@ -1,4 +1,4 @@
-package com.freemanan.cr.core.junit5;
+package com.freemanan.cr.core.framework.junit5;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;

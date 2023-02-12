@@ -1,6 +1,6 @@
 package com.freemanan.cr.core.util;
 
-import static com.freemanan.cr.core.anno.Action.Verb.ADD;
+import static com.freemanan.cr.core.anno.Verb.ADD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotSame;

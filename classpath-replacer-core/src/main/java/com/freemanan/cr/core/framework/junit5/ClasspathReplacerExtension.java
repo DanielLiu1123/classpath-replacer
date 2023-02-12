@@ -1,4 +1,4 @@
-package com.freemanan.cr.core.junit5;
+package com.freemanan.cr.core.framework.junit5;
 
 import com.freemanan.cr.core.ModifiedClassPathClassLoader;
 import com.freemanan.cr.core.ModifiedClassPathClassLoaderGenerator;
