@@ -21,4 +21,4 @@ jobs:
         run: openssl enc -aes-256-cbc -d -pbkdf2 -in secring.gpg.bin -out secring.gpg -pass pass:${{ secrets.DECRYPT_RING_PASSWORD }}
 
       - name: Release
-        run: RELEASE=true OSSRH_USER=${{ secrets.OSSRH_USER }} OSSRH_PASSWORD=${{ secrets.OSSRH_PASSWORD }} ./gradlew publish -Psigning.secretKeyRingFile=secring.gpg -Psigning.keyId=${{ secrets.SIGN_KEY_ID }} -Psigning.password=${{ secrets.SIGN_PASSWORD }}
+        run: RELEASE=true OSSRH_USER=${{ secrets.OSSRH_USER }} OSSRH_PASSWORD=${{ secrets.OSSRH_PASSWORD }} ./gradlew publish -Psigning.secretKeyRingFile=$(pwd)/secring.gpg -Psigning.keyId=${{ secrets.SIGN_KEY_ID }} -Psigning.password=${{ secrets.SIGN_PASSWORD }}
