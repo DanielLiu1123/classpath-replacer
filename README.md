@@ -1,6 +1,8 @@
 # Classpath Replacer
 
-This is a framework for replacing classpath. It's very useful for testing.
+This is a framework for replacing classpath.
+
+When you need to write unit tests for different classpath scenarios, you will need it!
 
 ## When you need
 
@@ -23,6 +25,24 @@ classpath.
 Classpath Replacer can help you simulate this scenario in your unit tests.
 
 ## How to use
+
+Gradle:
+
+```groovy
+testImplementation 'com.freemanan:classpath-replacer-junit5:1.0.0'
+```
+
+Maven:
+
+```xml
+
+<dependency>
+    <groupId>com.freemanan</groupId>
+    <artifactId>classpath-replacer-junit5</artifactId>
+    <version>1.0.0</version>
+    <scope>test</scope>
+</dependency>
+```
 
 `@ClasspathReplacer` is the core annotation of this framework. It can be used on the test class or test method.
 
