@@ -44,9 +44,9 @@ public @interface ClasspathReplacer {
     /**
      * Whether to exclude the sub-dependencies of the excluded dependency.
      *
-     * <p> Only works on {@link Verb#EXCLUDE} action, and the value must be a Maven coordinate with version.
+     * <p> Only works on {@link Verb#EXCLUDE} action, and the value must be a Maven coordinate (version is optional).
      *
-     * <p> For example: {@code org.springframework.cloud:spring-cloud-starter-bootstrap:4.0.0} is allowed, but {@code org.springframework.cloud:spring-cloud-starter-bootstrap} is not allowed.
+     * <p> For example: both {@code com.google.code.gson:gson:2.8.9} and {@code com.google.code.gson:gson} are allowed, if the version is not specified, will exclude all versions of the dependency and its sub-dependencies.
      *
      * @return whether to exclude the sub-dependencies of the excluded dependency.
      */
