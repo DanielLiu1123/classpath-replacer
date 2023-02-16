@@ -40,4 +40,15 @@ public @interface ClasspathReplacer {
      * @return the actions
      */
     Action[] value();
+
+    /**
+     * Whether to exclude the sub-dependencies of the excluded dependency.
+     *
+     * <p> Only works on {@link Verb#EXCLUDE} action, and the value must be a Maven coordinate with version.
+     *
+     * <p> For example: {@code org.springframework.cloud:spring-cloud-starter-bootstrap:4.0.0} is allowed, but {@code org.springframework.cloud:spring-cloud-starter-bootstrap} is not allowed.
+     *
+     * @return whether to exclude the sub-dependencies of the excluded dependency.
+     */
+    boolean recursiveExclude() default false;
 }

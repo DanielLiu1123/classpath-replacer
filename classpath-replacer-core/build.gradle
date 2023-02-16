@@ -6,6 +6,8 @@ dependencies {
     api("org.apache.maven.resolver:maven-resolver-connector-basic:${mavenResolverVersion}")
     api("org.apache.maven.resolver:maven-resolver-transport-http:${mavenResolverVersion}")
 
+    compileOnly("org.springframework.cloud:spring-cloud-starter-bootstrap:4.0.0")
+
     // Junit5
     compileOnly(platform("org.junit:junit-bom:${junit5Version}"))
     compileOnly("org.junit.jupiter:junit-jupiter-api")
@@ -17,6 +19,7 @@ dependencies {
     testImplementation(platform("org.junit:junit-bom:${junit5Version}"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.junit.platform:junit-platform-launcher")
+    testImplementation("ch.qos.logback:logback-classic:1.4.5")
 }
 
 apply from: "$rootDir/deploy.gradle"

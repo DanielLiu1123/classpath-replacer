@@ -2,9 +2,14 @@ package com.freemanan.cr.core.action;
 
 import static com.freemanan.cr.core.util.Const.JAR_FILE_NAME_PATTERN;
 import static com.freemanan.cr.core.util.Const.MAVEN_COORDINATE_PATTERN;
+import static com.freemanan.cr.core.util.Const.MAVEN_COORDINATE_WITH_VERSION_PATTERN;
 
+import com.freemanan.cr.core.ModifiedClassPathClassLoaderGenerator;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Freeman
@@ -14,12 +19,23 @@ public class Exclude {
     /**
      * File name patterns.
      *
-     * <p> e.g. gson-*.jar, *-starter-*.jar
+     * <p> Two patterns:
+     * <p> 1. Jar file name pattern: gson-*.jar
+     * <p> 2. Maven coordinate pattern: com.google.code.gson:gson:2.8.6 (must with version), will exclude all the dependencies it depends on.
+     *
      */
     private final List<String> patterns = new ArrayList<>();
 
     private Exclude() {}
 
+    /**
+     * File name patterns.
+     *
+     * <p> Two patterns:
+     * <p> 1. Jar file name pattern, like {@code gson-*.jar}
+     * <p> 2. Maven coordinate pattern with version, like {@code com.google.code.gson:gson:2.8.6}
+     *
+     */
     public List<String> patterns() {
         return List.copyOf(patterns);
     }
@@ -35,22 +51,40 @@ public class Exclude {
      * @return {@link Exclude}
      */
     public static Exclude of(String... patterns) {
-        List<String> fileNamePatterns = new ArrayList<>();
+        List<String> patternList = new ArrayList<>();
         for (String pattern : patterns) {
             if (pattern.matches(JAR_FILE_NAME_PATTERN)) {
-                fileNamePatterns.add(pattern);
+                patternList.add(pattern);
+            } else if (pattern.matches(MAVEN_COORDINATE_WITH_VERSION_PATTERN)) {
+                patternList.add(pattern);
             } else if (pattern.matches(MAVEN_COORDINATE_PATTERN)) {
+                // com.google.code.gson:gson is equivalent to gson-*.jar
                 String[] gav = pattern.split(":");
                 boolean hasVersion = gav.length == 3;
                 String artifactId = gav[1];
                 String filename = artifactId + "-" + (hasVersion ? gav[2] : "*") + ".jar";
-                fileNamePatterns.add(filename);
+                patternList.add(filename);
             } else {
                 throw new IllegalArgumentException("Invalid pattern: " + pattern);
             }
         }
         Exclude exclude = new Exclude();
-        exclude.patterns.addAll(List.copyOf(fileNamePatterns));
+        exclude.patterns.addAll(List.copyOf(patternList));
         return exclude;
+    }
+
+    /**
+     * {"com.google.code.gson:gson:2.8.6": [file:~/.m2/repository/com/google/code/gson/gson/2.8.6/gson-2.8.6.jar]}
+     */
+    public Map<String, List<URL>> coordinateMap() {
+        Map<String, List<URL>> result = new HashMap<>();
+        for (String pattern : patterns) {
+            if (!pattern.matches(MAVEN_COORDINATE_WITH_VERSION_PATTERN)) {
+                continue;
+            }
+            List<URL> urls = ModifiedClassPathClassLoaderGenerator.resolveCoordinates(new String[] {pattern});
+            result.put(pattern, urls);
+        }
+        return result;
     }
 }
