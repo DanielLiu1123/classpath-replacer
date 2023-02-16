@@ -37,11 +37,11 @@ class RecursiveExcludeTest {
                 @Action(verb = EXCLUDE, value = "org.springframework.cloud:spring-cloud-starter-bootstrap"),
             },
             recursiveExclude = true)
-    void notExcludeSubDependencies_whenUsingMavenCoordinateWithoutVersion() {
+    void excludeSubDependencies_whenUsingMavenCoordinateWithoutVersion() {
         assertThrows(ClassNotFoundException.class, () -> {
             Class.forName("org.springframework.cloud.bootstrap.marker.Marker");
         });
-        assertDoesNotThrow(() -> {
+        assertThrows(ClassNotFoundException.class, () -> {
             Class.forName("org.springframework.boot.SpringApplication");
         });
     }
