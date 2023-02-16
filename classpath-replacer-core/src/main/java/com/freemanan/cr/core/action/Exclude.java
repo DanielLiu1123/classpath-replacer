@@ -20,9 +20,8 @@ public class Exclude {
      * File name patterns.
      *
      * <p> Two patterns:
-     * <p> 1. Jar file name pattern: gson-*.jar
-     * <p> 2. Maven coordinate pattern: com.google.code.gson:gson:2.8.6 (must with version), will exclude all the dependencies it depends on.
-     *
+     * <p> 1. Jar file name pattern, like {@code gson-*.jar}
+     * <p> 2. Maven coordinate pattern, like {@code com.google.code.gson:gson:2.8.6} or {@code com.google.code.gson:gson} (without version will exclude all versions)
      */
     private final List<String> patterns = new ArrayList<>();
 
@@ -33,8 +32,7 @@ public class Exclude {
      *
      * <p> Two patterns:
      * <p> 1. Jar file name pattern, like {@code gson-*.jar}
-     * <p> 2. Maven coordinate pattern with version, like {@code com.google.code.gson:gson:2.8.6}
-     *
+     * <p> 2. Maven coordinate pattern, like {@code com.google.code.gson:gson:2.8.6} or {@code com.google.code.gson:gson} (without version will exclude all versions)
      */
     public List<String> patterns() {
         return List.copyOf(patterns);
@@ -53,17 +51,8 @@ public class Exclude {
     public static Exclude of(String... patterns) {
         List<String> patternList = new ArrayList<>();
         for (String pattern : patterns) {
-            if (pattern.matches(JAR_FILE_NAME_PATTERN)) {
+            if (pattern.matches(JAR_FILE_NAME_PATTERN) || pattern.matches(MAVEN_COORDINATE_PATTERN)) {
                 patternList.add(pattern);
-            } else if (pattern.matches(MAVEN_COORDINATE_WITH_VERSION_PATTERN)) {
-                patternList.add(pattern);
-            } else if (pattern.matches(MAVEN_COORDINATE_PATTERN)) {
-                // com.google.code.gson:gson is equivalent to gson-*.jar
-                String[] gav = pattern.split(":");
-                boolean hasVersion = gav.length == 3;
-                String artifactId = gav[1];
-                String filename = artifactId + "-" + (hasVersion ? gav[2] : "*") + ".jar";
-                patternList.add(filename);
             } else {
                 throw new IllegalArgumentException("Invalid pattern: " + pattern);
             }
