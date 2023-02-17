@@ -110,12 +110,8 @@ class RecursiveExcludeTest {
         assertThrows(ClassNotFoundException.class, () -> {
             Class.forName("org.springframework.boot.SpringApplication");
         });
-
-        // FIXME(Freeman): known issue, if dependencies with different versions have same version dependency, only
-        // exclude once.
-        // spring cloud 4.0.0 and 4.0.1 both have spring-security-rsa-1.0.11.RELEASE.jar, so only one of them is
-        // excluded.
-        assertDoesNotThrow(() -> {
+        // If dependencies with different versions have same version dependency, still works perfectly ^_*
+        assertThrows(ClassNotFoundException.class, () -> {
             Class.forName("org.springframework.security.rsa.crypto.RsaAlgorithm");
         });
     }

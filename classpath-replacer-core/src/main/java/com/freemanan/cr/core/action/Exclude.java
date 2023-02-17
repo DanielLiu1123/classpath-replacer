@@ -2,14 +2,9 @@ package com.freemanan.cr.core.action;
 
 import static com.freemanan.cr.core.util.Const.JAR_FILE_NAME_PATTERN;
 import static com.freemanan.cr.core.util.Const.MAVEN_COORDINATE_PATTERN;
-import static com.freemanan.cr.core.util.Const.MAVEN_COORDINATE_WITH_VERSION_PATTERN;
 
-import com.freemanan.cr.core.ModifiedClassPathClassLoaderGenerator;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Freeman
@@ -60,20 +55,5 @@ public class Exclude {
         Exclude exclude = new Exclude();
         exclude.patterns.addAll(List.copyOf(patternList));
         return exclude;
-    }
-
-    /**
-     * {"com.google.code.gson:gson:2.8.6": [file:~/.m2/repository/com/google/code/gson/gson/2.8.6/gson-2.8.6.jar]}
-     */
-    public Map<String, List<URL>> coordinateMap() {
-        Map<String, List<URL>> result = new HashMap<>();
-        for (String pattern : patterns) {
-            if (!pattern.matches(MAVEN_COORDINATE_WITH_VERSION_PATTERN)) {
-                continue;
-            }
-            List<URL> urls = ModifiedClassPathClassLoaderGenerator.resolveCoordinates(new String[] {pattern});
-            result.put(pattern, urls);
-        }
-        return result;
     }
 }

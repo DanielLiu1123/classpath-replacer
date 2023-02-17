@@ -14,17 +14,15 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+import java.util.function.Supplier;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.eclipse.aether.DefaultRepositorySystemSession;
@@ -85,7 +83,11 @@ public class ModifiedClassPathClassLoaderGenerator {
 
     public ModifiedClassPathClassLoader gen() {
         URL[] urls = extractUrls(parent);
-        List<URL> result = Arrays.stream(urls).collect(Collectors.toList());
+        List<URL> result = Arrays.stream(urls)
+                .collect(
+                        LinkedList::new,
+                        List::add,
+                        List::addAll); // we may have some exclude actions, LinkedList is better
         actions.forEach(action -> {
             if (action instanceof Exclude exclude) {
                 exclude(result, exclude, recursiveExclude);
@@ -113,76 +115,69 @@ public class ModifiedClassPathClassLoaderGenerator {
     private static void exclude(List<URL> result, Exclude exclude, boolean recursiveExclude) {
         // com.google.code.gson:gson:2.8.6 -> [file:~/.m2/repository/com/google/code/gson/gson/2.8.6/gson-2.8.6.jar]
         Map<String, List<URL>> patternToJars = new HashMap<>();
-        Set<String> removed = new HashSet<>();
+        // com.google.code.gson:gson -> [2.8.6, 2.8.7]
+        Map<String, List<String>> patternToVersions = new HashMap<>();
+
         List<URL> copy = new ArrayList<>(result);
-        result.removeIf(
-                url -> exclude.patterns().stream().anyMatch(pattern -> {
-                    // like com.google.code.gson:gson:2.8.6
-                    if (pattern.matches(Const.MAVEN_COORDINATE_WITH_VERSION_PATTERN)) {
-                        if (recursiveExclude) {
-                            // if the pattern is a maven coordinate, parse out all the jar packages it depends on
-                            // we only remove once!
-                            if (!removed.contains(url.toString())) {
-                                // still not removed
-                                List<String> urls = patternToJars
-                                        .computeIfAbsent(pattern, s -> resolveCoordinates(new String[] {pattern}))
-                                        .stream()
-                                        .map(Objects::toString)
-                                        .toList();
-                                boolean remove = urls.contains(url.toString());
-                                if (remove) {
-                                    removed.add(url.toString());
-                                }
-                                return remove;
-                            }
-                            // already removed
-                            return false;
-                        }
-                        String[] gav = pattern.split(":");
-                        String artifactId = gav[1];
-                        String version = gav[2];
-                        String jarName = artifactId + "-" + version + ".jar";
-                        return jarName.equals(fileName(url));
-                    }
-                    // like com.google.code.gson:gson
-                    if (pattern.matches(Const.MAVEN_COORDINATE_PATTERN)) {
-                        if (recursiveExclude) {
-                            // we only remove once!
-                            if (removed.contains(url.toString())) {
-                                return false;
-                            }
-                            List<String> versions = findVersions(copy, pattern);
-                            for (String version : versions) {
-                                // still not removed
-                                String coordinate = pattern + ":" + version;
-                                List<String> urls = patternToJars
-                                        .computeIfAbsent(coordinate, s -> resolveCoordinates(new String[] {coordinate}))
-                                        .stream()
-                                        .map(Objects::toString)
-                                        .toList();
-                                boolean find = urls.contains(url.toString());
-                                if (find) {
-                                    removed.add(url.toString());
-                                    return true;
-                                }
-                            }
-                            // not contains in any versions
-                            return false;
-                        }
-                        // if not recursive exclude, we only remove the jar with the same artifactId
-                        String[] gav = pattern.split(":");
-                        String artifactId = gav[1];
-                        String regex = String.format("%s-.*\\.jar", artifactId);
-                        return Pattern.matches(regex, fileName(url));
-                    }
-                    // like gson-*.jar
-                    if (pattern.contains("*")) {
-                        String regex = pattern.replace(".", "\\.").replace("*", ".*");
-                        return Pattern.matches(regex, fileName(url));
-                    }
-                    // like gson-2.8.6.jar
-                    return pattern.equals(fileName(url));
-                }));
+
+        for (String pattern : exclude.patterns()) {
+            Supplier<Map<String, List<String>>> patternToVersionsSupplier = () -> {
+                patternToVersions.putIfAbsent(pattern, findVersions(copy, pattern));
+                return patternToVersions;
+            };
+            for (URL url : copy) {
+                if (needRemove(patternToVersionsSupplier, url, pattern, patternToJars, recursiveExclude)) {
+                    result.remove(url);
+                }
+            }
+        }
+    }
+
+    private static boolean needRemove(
+            Supplier<Map<String, List<String>>> patternToVersionsSupplier,
+            URL url,
+            String pattern,
+            Map<String, List<URL>> patternToJars,
+            boolean recursiveExclude) {
+        // like com.google.code.gson:gson:2.8.6
+        if (pattern.matches(Const.MAVEN_COORDINATE_WITH_VERSION_PATTERN)) {
+            if (!recursiveExclude) {
+                String[] gav = pattern.split(":");
+                String artifactId = gav[1];
+                String version = gav[2];
+                String jarName = artifactId + "-" + version + ".jar";
+                return jarName.equals(fileName(url));
+            }
+            return patternToJars.computeIfAbsent(pattern, s -> resolveCoordinates(new String[] {pattern})).stream()
+                    .anyMatch(jarPath -> Objects.equals(jarPath.toString(), url.toString()));
+        }
+
+        // like com.google.code.gson:gson
+        if (pattern.matches(Const.MAVEN_COORDINATE_PATTERN)) {
+            if (!recursiveExclude) {
+                String[] gav = pattern.split(":");
+                String artifactId = gav[1];
+                String regex = String.format("%s-.*\\.jar", artifactId);
+                return Pattern.matches(regex, fileName(url));
+            }
+            return patternToVersionsSupplier.get().getOrDefault(pattern, List.of()).stream()
+                    .anyMatch(version -> {
+                        String coordinate = pattern + ":" + version;
+                        return patternToJars
+                                .computeIfAbsent(coordinate, s -> resolveCoordinates(new String[] {coordinate}))
+                                .stream()
+                                .anyMatch(jarPath -> Objects.equals(jarPath.toString(), url.toString()));
+                    });
+        }
+
+        // like gson-*.jar
+        if (pattern.contains("*")) {
+            String regex = pattern.replace(".", "\\.").replace("*", ".*");
+            return Pattern.matches(regex, fileName(url));
+        }
+
+        // like gson-2.8.6.jar
+        return pattern.equals(fileName(url));
     }
 
     private static List<String> findVersions(List<URL> urls, String groupAndArtifact) {
