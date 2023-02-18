@@ -53,12 +53,13 @@ represents a classpath replacement rule.
 
 - `ADD`：
 
-  Add dependencies, `@Action(verb = ADD, value = "org.springframework.boot:spring-boot:3.0.0")` will
+  Add dependencies, add dependencies if not exist, otherwise replace the existing dependency with the specified
+  version. `@Action(verb = ADD, value = "org.springframework.boot:spring-boot:3.0.0")` will
   add `spring-boot:3.0.0` and **its transitive dependencies** to the classpath.
 
 - `EXCLUDE`：
 
-  Exclude dependencies, value supports jar package name and maven coordinate
+  Exclude dependencies, value supports jar package name and maven coordinate.
 
   `@Action(verb = ADD, value = "spring-boot-3.0.0.jar")`, this will exclude `spring-boot-3.0.0.jar` from the
   classpath, **but not include its transitive dependencies.** Support wildcard matching, such
@@ -77,9 +78,6 @@ represents a classpath replacement rule.
   will exclude all versions of `spring-boot` jars and their transitive dependencies.
 
 - `OVERRIDE`：
-
-  Override dependencies, add dependencies if not exist, otherwise replace the existing dependency with the specified
-  version.
 
   **`Override` has the same behavior as `ADD`**, separate `ADD` and `OVERRIDE` just for clearer semantic expression.
 
