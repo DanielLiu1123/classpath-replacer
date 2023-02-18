@@ -1,5 +1,10 @@
 # Classpath Replacer
 
+[![Build](https://img.shields.io/github/actions/workflow/status/DanielLiu1123/classpath-replacer/build.yml?branch=main)](https://github.com/DanielLiu1123/classpath-replacer/actions)
+[![CodeFactor](https://www.codefactor.io/repository/github/danielliu1123/classpath-replacer/badge)](https://www.codefactor.io/repository/github/danielliu1123/classpath-replacer)
+[![Maven Central](https://img.shields.io/maven-central/v/com.freemanan/classpath-replacer-core)](https://search.maven.org/artifact/com.freemanan/classpath-replacer-core)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 This is a framework for replacing classpath.
 
 When you need to write unit tests for different classpath scenarios, you will need it!
