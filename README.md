@@ -49,30 +49,57 @@ Maven:
 You can define your classpath replacement rules in `@ClasspathReplacer`, which consists of `@Action`, each `@Action`
 represents a classpath replacement rule.
 
-`@Action` has two attributes:
+`@Action` has three verbs:
 
-- `verb`：The action to be performed on the classpath
-    - `ADD`：add dependencies
-    - `EXCLUDE`：exclude dependencies
-    - `OVERRIDE`：override dependencies
-- `value`：The value corresponding to verb
+- `ADD`：
 
-All `@Action` are executed in the order of definition, for example:
+  Add dependencies, `@Action(verb = ADD, value = "org.springframework.boot:spring-boot:3.0.0")` will
+  add `spring-boot:3.0.0` and **its transitive dependencies** to the classpath.
+
+- `EXCLUDE`：
+
+  Exclude dependencies, value supports jar package name and maven coordinate
+
+  `@Action(verb = ADD, value = "spring-boot-3.0.0.jar")`, this will exclude `spring-boot-3.0.0.jar` from the
+  classpath, **but not include its transitive dependencies.** Support wildcard matching, such
+  as `spring-boot-*.jar`, will exclude all versions of `spring-boot` jars in the classpath. Using jar package name
+  **can't exclude transitive dependencies.**
+
+  `@Action(verb = ADD, value = "org.springframework.boot:spring-boot:3.0.0")`, this is same as above. If you want to
+  exclude all versions of `spring-boot` jars,
+  use `@Action(verb = ADD, value = "org.springframework.boot:spring-boot")`, just omit the version.
+
+  Using maven coordinate don't exclude the transitive dependencies by default, you can set `recursiveExclude` to
+  true to enable this feature.
+  `@ClasspathReplacer(recursiveExclude = true, value = {@Action(verb = ADD, value = "org.springframework.boot:spring-boot:3.0.0")})`
+  will exclude `spring-boot:3.0.0` and its transitive dependencies. You can omit the
+  version, `@ClasspathReplacer(recursiveExclude = true, value = {@Action(verb = ADD, value = "org.springframework.boot:spring-boot")})`
+  will exclude all versions of `spring-boot` jars and their transitive dependencies.
+
+- `OVERRIDE`：
+
+  Override dependencies, add dependencies if not exist, otherwise replace the existing dependency with the specified
+  version.
+
+  **`Override` has the same behavior as `ADD`**, separate `ADD` and `OVERRIDE` just for clearer semantic expression.
+
+All the `@Action` are executed in the order of definition, for example:
 
 ```java
 
 @ClasspathReplacer({
         @Action(verb = ADD, value = "com.google.code.gson:gson:2.8.9"),
+        @Action(verb = EXCLUDE, value = "com.google.code.gson:gson:2.8.9"),
         @Action(verb = ADD, value = "com.google.code.gson:gson:2.9.0")
 })
 class SomeTest {
 }
 ```
 
-The above `@ClasspathReplacer` will add `gson:2.8.9` first, and then add `gson:2.9.0`. The final classpath will
-be `gson:2.9.0`.
+The above `@ClasspathReplacer` will add `gson:2.8.9` first, and exclude `gson:2.8.9`, then add `gson:2.9.0`. The final
+classpath will be `gson:2.9.0`.
 
-For the test scenario of the above `JsonUtil`, you can write the following tests:
+For the test scenarios of the above `JsonUtil`, you can write the following tests:
 
 ```java
 class JsonUtilTest {

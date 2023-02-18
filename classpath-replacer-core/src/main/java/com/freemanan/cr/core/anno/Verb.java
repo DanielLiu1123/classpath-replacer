@@ -22,7 +22,7 @@ public enum Verb {
      * <p>
      * If the jar is already in the classpath, it will use the specific version first.
      * <p>
-     * NOTE: Override has the same effect as {@link #ADD}, Separate {@link #ADD} and OVERRIDE for clearer semantic expression.
+     * NOTE: Override has the same effect as {@link #ADD}, separate {@link #ADD} and OVERRIDE for clearer semantic expression.
      *
      * @see #ADD
      */
