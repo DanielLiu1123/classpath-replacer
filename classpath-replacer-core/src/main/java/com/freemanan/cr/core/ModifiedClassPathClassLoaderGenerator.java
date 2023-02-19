@@ -49,17 +49,16 @@ import org.eclipse.aether.util.repository.AuthenticationBuilder;
  * @author Freeman
  */
 public class ModifiedClassPathClassLoaderGenerator {
+    private static final Pattern INTELLIJ_CLASSPATH_JAR_PATTERN = Pattern.compile(".*classpath(\\d+)?\\.jar");
+    private static final int MAX_RESOLUTION_ATTEMPTS = 3;
+
     private final List<Object> actions = new LinkedList<>();
+    private final ClassLoader parent;
 
     /**
      * Nullable, because {@link ModifiedClassPathClassLoaderGenerator} may be used to programmatically generate classloader.
      */
     private ClasspathReplacer classpathReplacer;
-
-    private static final Pattern INTELLIJ_CLASSPATH_JAR_PATTERN = Pattern.compile(".*classpath(\\d+)?\\.jar");
-    private static final int MAX_RESOLUTION_ATTEMPTS = 3;
-
-    private final ClassLoader parent;
 
     private ModifiedClassPathClassLoaderGenerator(ClassLoader parent) {
         this.parent = parent;
