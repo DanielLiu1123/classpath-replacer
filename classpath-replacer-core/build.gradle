@@ -6,8 +6,6 @@ dependencies {
     api("org.apache.maven.resolver:maven-resolver-connector-basic:${mavenResolverVersion}")
     api("org.apache.maven.resolver:maven-resolver-transport-http:${mavenResolverVersion}")
 
-    compileOnly("org.springframework.cloud:spring-cloud-starter-bootstrap:4.0.0")
-
     // Junit5
     compileOnly(platform("org.junit:junit-bom:${junit5Version}"))
     compileOnly("org.junit.jupiter:junit-jupiter-api")
