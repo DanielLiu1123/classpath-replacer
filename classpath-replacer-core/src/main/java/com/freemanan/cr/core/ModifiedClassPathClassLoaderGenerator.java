@@ -20,6 +20,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
@@ -51,7 +52,7 @@ public class ModifiedClassPathClassLoaderGenerator {
     private final List<Object> actions = new LinkedList<>();
 
     /**
-     * Nullable
+     * Nullable, because {@link ModifiedClassPathClassLoaderGenerator} may be used to programmatically generate classloader.
      */
     private ClasspathReplacer classpathReplacer;
 
@@ -129,6 +130,9 @@ public class ModifiedClassPathClassLoaderGenerator {
 
         List<URL> copy = new ArrayList<>(result);
 
+        boolean recursiveExclude = Optional.ofNullable(classpathReplacer)
+                .map(ClasspathReplacer::recursiveExclude)
+                .orElse(false);
         for (String pattern : exclude.patterns()) {
             Supplier<Map<String, List<String>>> patternToVersionsSupplier = () -> {
                 patternToVersions.putIfAbsent(pattern, findVersions(copy, pattern));
@@ -136,12 +140,7 @@ public class ModifiedClassPathClassLoaderGenerator {
             };
             for (URL url : copy) {
                 if (needRemove(
-                        patternToVersionsSupplier,
-                        url,
-                        pattern,
-                        patternToJars,
-                        classpathReplacer.recursiveExclude(),
-                        classpathReplacer)) {
+                        patternToVersionsSupplier, url, pattern, patternToJars, recursiveExclude, classpathReplacer)) {
                     result.remove(url);
                 }
             }
