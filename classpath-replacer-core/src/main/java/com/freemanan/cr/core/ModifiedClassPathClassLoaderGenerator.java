@@ -97,11 +97,11 @@ public class ModifiedClassPathClassLoaderGenerator {
                         List::addAll); // we may have some exclude actions, LinkedList is better
         actions.forEach(action -> {
             if (action instanceof Exclude exclude) {
-                exclude(result, exclude, classpathReplacer);
+                exclude(result, exclude);
             } else if (action instanceof Add add) {
-                add(result, add, classpathReplacer);
+                add(result, add);
             } else if (action instanceof Override override) {
-                override(result, override, classpathReplacer);
+                override(result, override);
             } else {
                 throw new IllegalArgumentException("Unknown action: " + action);
             }
@@ -109,50 +109,46 @@ public class ModifiedClassPathClassLoaderGenerator {
         return new ModifiedClassPathClassLoader(result.toArray(URL[]::new), parent.getParent(), parent);
     }
 
-    private static void override(List<URL> result, Override override, ClasspathReplacer classpathReplacer) {
+    private void override(List<URL> result, Override override) {
         // have same behavior as add
-        add(result, Add.of(override.coordinates().toArray(String[]::new)), classpathReplacer);
+        add(result, Add.of(override.coordinates().toArray(String[]::new)));
     }
 
-    private static void add(List<URL> result, Add add, ClasspathReplacer classpathReplacer) {
+    private void add(List<URL> result, Add add) {
         List<String> coordinates =
                 add.coordinates().stream().sorted(Comparator.reverseOrder()).toList();
         // Add to the beginning of the list to make sure the added jars are loaded first.
-        result.addAll(0, getAdditionalUrls(coordinates, classpathReplacer));
+        result.addAll(0, getAdditionalUrls(coordinates));
     }
 
-    private static void exclude(List<URL> result, Exclude exclude, ClasspathReplacer classpathReplacer) {
+    private void exclude(List<URL> result, Exclude exclude) {
         // com.google.code.gson:gson:2.8.6 -> [file:~/.m2/repository/com/google/code/gson/gson/2.8.6/gson-2.8.6.jar]
         Map<String, List<URL>> patternToJars = new HashMap<>();
         // com.google.code.gson:gson -> [2.8.6, 2.8.7]
         Map<String, List<String>> patternToVersions = new HashMap<>();
 
         List<URL> copy = new ArrayList<>(result);
-
-        boolean recursiveExclude = Optional.ofNullable(classpathReplacer)
-                .map(ClasspathReplacer::recursiveExclude)
-                .orElse(false);
         for (String pattern : exclude.patterns()) {
             Supplier<Map<String, List<String>>> patternToVersionsSupplier = () -> {
                 patternToVersions.putIfAbsent(pattern, findVersions(copy, pattern));
                 return patternToVersions;
             };
             for (URL url : copy) {
-                if (needRemove(
-                        patternToVersionsSupplier, url, pattern, patternToJars, recursiveExclude, classpathReplacer)) {
+                if (needRemove(patternToVersionsSupplier, url, pattern, patternToJars)) {
                     result.remove(url);
                 }
             }
         }
     }
 
-    private static boolean needRemove(
+    private boolean needRemove(
             Supplier<Map<String, List<String>>> patternToVersionsSupplier,
             URL url,
             String pattern,
-            Map<String, List<URL>> patternToJars,
-            boolean recursiveExclude,
-            ClasspathReplacer classpathReplacer) {
+            Map<String, List<URL>> patternToJars) {
+        boolean recursiveExclude = Optional.ofNullable(classpathReplacer)
+                .map(ClasspathReplacer::recursiveExclude)
+                .orElse(false);
         // like com.google.code.gson:gson:2.8.6
         if (pattern.matches(Const.MAVEN_COORDINATE_WITH_VERSION_PATTERN)) {
             if (!recursiveExclude) {
@@ -302,13 +298,20 @@ public class ModifiedClassPathClassLoaderGenerator {
         }
     }
 
-    private static List<URL> getAdditionalUrls(List<String> coordinates, ClasspathReplacer classpathReplacer) {
+    private List<URL> getAdditionalUrls(List<String> coordinates) {
         if (coordinates.isEmpty()) {
             return Collections.emptyList();
         }
         return resolveCoordinates(coordinates.toArray(new String[0]), classpathReplacer);
     }
 
+    /**
+     * Resolves Maven coordinates to a list of URLs.
+     *
+     * @param coordinates       Maven coordinates of the form groupId:artifactId:version
+     * @param classpathReplacer classpath replacer, nullable
+     * @return list of URLs to the resolved artifacts
+     */
     public static List<URL> resolveCoordinates(String[] coordinates, ClasspathReplacer classpathReplacer) {
         DefaultServiceLocator serviceLocator = MavenRepositorySystemUtils.newServiceLocator();
         serviceLocator.addService(RepositoryConnectorFactory.class, BasicRepositoryConnectorFactory.class);
