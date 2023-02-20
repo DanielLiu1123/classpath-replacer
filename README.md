@@ -102,6 +102,24 @@ class SomeTest {
 The above `@ClasspathReplacer` will add `gson:2.8.9` first, and exclude `gson:2.8.9`, then add `gson:2.9.0`. The final
 classpath will be `gson:2.9.0`.
 
+Proxy repositories and private repositories can be configured in `@ClasspathReplacer`, such as:
+
+```java
+
+@ClasspathReplacer(
+        repositories = {
+                @Repository("https://maven.aliyun.com/repository/public/"),
+                @Repository(value = "https://maven.youcompany.com/repository/release/", username = "admin", password = "${MAVEN_PASSWORD}")
+        },
+        value = {
+                @Action(verb = ADD, value = "com.yourcompany:your-library:1.0.0")
+        })
+class SomeTest {
+}
+```
+
+`username` and `password` support `${}` variable replacement, it will be parsed from system env or system properties, system env has higher priority.
+
 For the test scenarios of the above `JsonUtil`, you can write the following tests:
 
 ```java
