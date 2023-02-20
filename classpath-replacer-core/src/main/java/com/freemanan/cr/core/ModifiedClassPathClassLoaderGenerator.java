@@ -358,20 +358,31 @@ public class ModifiedClassPathClassLoaderGenerator {
         for (Repository repo : classpathReplacer.repositories()) {
             String id = (repo.id() == null || repo.id().isBlank()) ? repo.value() : repo.id();
             String url = repo.value();
-            RemoteRepository.Builder builder = new RemoteRepository.Builder(id, null, url);
-            if (repo.username() != null
-                    && !repo.username().isBlank()
-                    && repo.password() != null
-                    && !repo.password().isBlank()) {
+            RemoteRepository.Builder builder = new RemoteRepository.Builder(id, "default", url);
+            String username = parseIfNecessary(repo.username());
+            String password = parseIfNecessary(repo.password());
+            if (username != null && !username.isBlank() && password != null && !password.isBlank()) {
                 builder.setAuthentication(new AuthenticationBuilder()
-                        .addUsername(repo.username())
-                        .addPassword(repo.password())
+                        .addUsername(username)
+                        .addPassword(password)
                         .build());
             }
             RemoteRepository repository = builder.build();
             extraRepositories.add(repository);
         }
         return extraRepositories;
+    }
+
+    private static String parseIfNecessary(String str) {
+        if (str == null || str.isBlank()) {
+            return str;
+        }
+        if (str.startsWith("${") && str.endsWith("}")) {
+            String variable = str.substring(2, str.length() - 1);
+            String v = Optional.ofNullable(System.getenv(variable)).orElse(System.getProperty(variable));
+            return v != null ? v : str;
+        }
+        return str;
     }
 
     private static RemoteRepository centralRepository() {
