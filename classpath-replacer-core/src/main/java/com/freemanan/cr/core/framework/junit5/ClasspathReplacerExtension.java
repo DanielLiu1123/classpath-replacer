@@ -117,7 +117,7 @@ public class ClasspathReplacerExtension implements InvocationInterceptor {
                 default -> throw new IllegalStateException("Unexpected value: " + action.verb());
             }
         }
-        generator.recursiveExclude(cr.recursiveExclude());
+        generator.classpathReplacer(cr);
         return generator.gen();
     }
 

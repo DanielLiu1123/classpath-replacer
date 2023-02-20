@@ -42,6 +42,15 @@ public @interface ClasspathReplacer {
     Action[] value();
 
     /**
+     * Extra repositories to use when resolving dependencies.
+     *
+     * <p> Default repository is maven central.
+     *
+     * @return extra repositories
+     */
+    Repository[] repositories() default {};
+
+    /**
      * Whether to exclude the sub-dependencies of the excluded dependency.
      *
      * <p> Only works on {@link Verb#EXCLUDE} action, and the value must be a Maven coordinate (version is optional).
