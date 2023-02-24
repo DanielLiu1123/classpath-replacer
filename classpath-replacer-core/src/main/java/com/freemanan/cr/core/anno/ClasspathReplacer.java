@@ -13,19 +13,42 @@ import org.junit.jupiter.api.extension.ExtendWith;
  * <p>
  * This operation is performed in order, so if there are multiple operations, you need to pay attention to the order.
  *
- * <p>
- * For example:
- * <pre>{@code
- * ClasspathReplacer({
- *     @Action(action = EXCLUDE, value = "slf4j-log4j12-*.jar"),
- *     @Action(action = ADD, value = "ch.qos.logback:logback-classic:1.4.5")
- * })
- * class SomeTest {}
- * }</pre>
- * <p> This will exclude the {@code slf4j-log4j12} first then add the {@code logback-classic} jar.
+ * <p> Examples:
  *
- * <p>
- * When add new dependencies, there may be dependency conflicts. For example, the log framework used by the current program is {@code logback}, and the added dependency using {@code log4j}.
+ * <p> Exclude the {@code slf4j-log4j12} first then add the {@code logback-classic} jar:
+ * <pre>{@code
+ * @ClasspathReplacer(
+ *     value = {
+ *         @Action(verb = EXCLUDE, value = "slf4j-log4j12-*.jar"),
+ *         @Action(verb = ADD, value = "ch.qos.logback:logback-classic:1.4.5")
+ *     }
+ * )
+ * }</pre>
+ *
+ * <p> Exclude the {@code spring-boot-starter-web} and all its sub-dependencies:
+ * <pre>{@code
+ * @ClasspathReplacer(
+ *     value = {
+ *         @Action(verb = EXCLUDE, value = "org.springframework.boot:spring-boot-starter-web")
+ *     },
+ *     recursiveExclude = true
+ * )
+ * }</pre>
+ *
+ * <p> Configure the extra repositories or proxy repository to use when resolving dependencies:
+ * <pre>{@code
+ * @ClasspathReplacer(
+ *     value = {
+ *         @Action(verb = ADD, value = "com.youcompany:your-dependency:1.0.0")
+ *     },
+ *     repositories = {
+ *         @Repository(value = "https://maven.youcompany.com/repository/release/", username = "admin", password = "${MAVEN_PASSWORD}"),
+ *         @Repository("https://maven.aliyun.com/repository/public/")
+ *     }
+ * )
+ * }</pre>
+ *
+ * <p> When add new dependencies, there may be dependency conflicts. For example, the log framework used by the current program is {@code logback}, and the added dependency using {@code log4j}.
  * Therefore, in complex scenarios, the ability to define the order of actions is a very important feature.
  *
  * @author Freeman

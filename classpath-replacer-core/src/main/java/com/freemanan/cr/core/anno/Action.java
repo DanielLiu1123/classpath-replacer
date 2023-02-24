@@ -14,7 +14,18 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface Action {
 
+    /**
+     * The values associated with the {@link #verb}.
+     *
+     * @return value
+     */
     String[] value();
 
+    /**
+     * The verb of the action.
+     *
+     * @return {@link Verb}
+     * @see Verb
+     */
     Verb verb() default Verb.ADD;
 }
