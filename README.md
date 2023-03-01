@@ -66,20 +66,20 @@ represents a classpath replacement rule.
 
   Exclude dependencies, value supports jar package name and maven coordinate.
 
-  `@Action(verb = ADD, value = "spring-boot-3.0.0.jar")`, this will exclude `spring-boot-3.0.0.jar` from the
+  `@Action(verb = EXCLUDE, value = "spring-boot-3.0.0.jar")`, this will exclude `spring-boot-3.0.0.jar` from the
   classpath, **but not include its transitive dependencies.** Support wildcard matching, such
   as `spring-boot-*.jar`, will exclude all versions of `spring-boot` jars in the classpath. Using jar package name
   **can't exclude transitive dependencies.**
 
-  `@Action(verb = ADD, value = "org.springframework.boot:spring-boot:3.0.0")`, this is same as above. If you want to
+  `@Action(verb = EXCLUDE, value = "org.springframework.boot:spring-boot:3.0.0")`, this is same as above. If you want to
   exclude all versions of `spring-boot` jars,
-  use `@Action(verb = ADD, value = "org.springframework.boot:spring-boot")`, just omit the version.
+  use `@Action(verb = EXCLUDE, value = "org.springframework.boot:spring-boot")`, just omit the version.
 
   Using maven coordinate doesn't exclude the transitive dependencies by default, you can set `recursiveExclude` to
   true to enable this feature.
-  `@ClasspathReplacer(recursiveExclude = true, value = {@Action(verb = ADD, value = "org.springframework.boot:spring-boot:3.0.0")})`
+  `@ClasspathReplacer(recursiveExclude = true, value = {@Action(verb = EXCLUDE, value = "org.springframework.boot:spring-boot:3.0.0")})`
   will exclude `spring-boot:3.0.0` and its transitive dependencies. You can omit the
-  version, `@ClasspathReplacer(recursiveExclude = true, value = {@Action(verb = ADD, value = "org.springframework.boot:spring-boot")})`
+  version, `@ClasspathReplacer(recursiveExclude = true, value = {@Action(verb = EXCLUDE, value = "org.springframework.boot:spring-boot")})`
   will exclude all versions of `spring-boot` jars and their transitive dependencies.
 
 - `OVERRIDE`：
