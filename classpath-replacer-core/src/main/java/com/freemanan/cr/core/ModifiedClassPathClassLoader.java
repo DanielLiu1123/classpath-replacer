@@ -4,6 +4,7 @@ import com.freemanan.cr.core.framework.packager.PackagerHolder;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -19,7 +20,7 @@ public class ModifiedClassPathClassLoader extends URLClassLoader {
         this.appClassLoader = appClassLoader;
         this.internalPackages = PackagerHolder.getPackagers().stream()
                 .flatMap(packager -> Stream.of(packager.internalPackages()))
-                .toList();
+                .collect(Collectors.toList());
     }
 
     @Override

@@ -17,7 +17,7 @@ class RecursiveExcludeTest {
     @Test
     @ClasspathReplacer(
             value = {
-                @Action(verb = ADD, value = "org.springframework.cloud:spring-cloud-starter-bootstrap:4.0.0"),
+                @Action(verb = ADD, value = "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.5"),
                 @Action(verb = EXCLUDE, value = "spring-cloud-starter-bootstrap-*.jar"),
             },
             recursiveExclude = true)
@@ -33,7 +33,7 @@ class RecursiveExcludeTest {
     @Test
     @ClasspathReplacer(
             value = {
-                @Action(verb = ADD, value = "org.springframework.cloud:spring-cloud-starter-bootstrap:4.0.0"),
+                @Action(verb = ADD, value = "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.5"),
                 @Action(verb = EXCLUDE, value = "org.springframework.cloud:spring-cloud-starter-bootstrap"),
             },
             recursiveExclude = true)
@@ -49,8 +49,8 @@ class RecursiveExcludeTest {
     @Test
     @ClasspathReplacer(
             value = {
-                @Action(verb = ADD, value = "org.springframework.cloud:spring-cloud-starter-bootstrap:4.0.0"),
-                @Action(verb = EXCLUDE, value = "org.springframework.cloud:spring-cloud-starter-bootstrap:4.0.0"),
+                @Action(verb = ADD, value = "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.5"),
+                @Action(verb = EXCLUDE, value = "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.5"),
             },
             recursiveExclude = true)
     void excludeSubDependencies_whenUsingMavenCoordinate() {
@@ -65,8 +65,8 @@ class RecursiveExcludeTest {
     @Test
     @ClasspathReplacer(
             value = {
-                @Action(verb = ADD, value = "org.springframework.cloud:spring-cloud-starter-bootstrap:4.0.0"),
-                @Action(verb = EXCLUDE, value = "org.springframework.cloud:spring-cloud-starter-bootstrap:4.0.0"),
+                @Action(verb = ADD, value = "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.5"),
+                @Action(verb = EXCLUDE, value = "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.5"),
             },
             recursiveExclude = false)
     void notExcludeSubDependencies_whenRecursiveExcludeDisabled() {
@@ -81,9 +81,9 @@ class RecursiveExcludeTest {
     @Test
     @ClasspathReplacer(
             value = {
-                @Action(verb = ADD, value = "org.springframework.cloud:spring-cloud-starter-bootstrap:4.0.1"),
-                @Action(verb = ADD, value = "org.springframework.cloud:spring-cloud-starter-bootstrap:4.0.0"),
-                @Action(verb = EXCLUDE, value = "org.springframework.cloud:spring-cloud-starter-bootstrap:4.0.0"),
+                @Action(verb = ADD, value = "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.6"),
+                @Action(verb = ADD, value = "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.5"),
+                @Action(verb = EXCLUDE, value = "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.5"),
             },
             recursiveExclude = true)
     void excludeSubDependencies_whenHasDifferentVersion_thenOnlyCurrentVersionIsExcluded() {
@@ -98,8 +98,8 @@ class RecursiveExcludeTest {
     @Test
     @ClasspathReplacer(
             value = {
-                @Action(verb = ADD, value = "org.springframework.cloud:spring-cloud-starter-bootstrap:4.0.1"),
-                @Action(verb = ADD, value = "org.springframework.cloud:spring-cloud-starter-bootstrap:4.0.0"),
+                @Action(verb = ADD, value = "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.6"),
+                @Action(verb = ADD, value = "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.5"),
                 @Action(verb = EXCLUDE, value = "org.springframework.cloud:spring-cloud-starter-bootstrap"),
             },
             recursiveExclude = true)
@@ -119,8 +119,8 @@ class RecursiveExcludeTest {
     @Test
     @ClasspathReplacer(
             value = {
-                @Action(verb = ADD, value = "org.springframework.cloud:spring-cloud-starter-bootstrap:4.0.1"),
-                @Action(verb = ADD, value = "org.springframework.cloud:spring-cloud-starter-bootstrap:4.0.0"),
+                @Action(verb = ADD, value = "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.6"),
+                @Action(verb = ADD, value = "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.5"),
                 @Action(verb = EXCLUDE, value = "org.springframework.cloud:spring-cloud-starter-bootstrap"),
             },
             recursiveExclude = false)

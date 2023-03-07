@@ -2,6 +2,7 @@ package com.freemanan.cr.core.action;
 
 import com.freemanan.cr.core.util.Const;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -14,7 +15,7 @@ public class Override {
     private Override() {}
 
     public List<String> coordinates() {
-        return List.copyOf(coordinates);
+        return Collections.unmodifiableList(coordinates);
     }
 
     public static Override of(String... coordinates) {
@@ -28,7 +29,7 @@ public class Override {
         }
 
         Override override = new Override();
-        override.coordinates.addAll(List.copyOf(validCoordinates));
+        override.coordinates.addAll(validCoordinates);
         return override;
     }
 }

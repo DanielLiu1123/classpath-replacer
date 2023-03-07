@@ -14,20 +14,20 @@ class AddOrderTest {
 
     @Test
     @ClasspathReplacer({
-        @Action(verb = ADD, value = "org.springframework.boot:spring-boot:3.0.0"),
-        @Action(verb = ADD, value = "org.springframework.boot:spring-boot:3.0.1"),
+        @Action(verb = ADD, value = "org.springframework.boot:spring-boot:2.7.0"),
+        @Action(verb = ADD, value = "org.springframework.boot:spring-boot:2.7.1"),
     })
     void versionShouldBe3_0_1_whenAdd3_0_0_thenAdd3_0_1() {
-        assertEquals("3.0.1", springBootVersion());
+        assertEquals("2.7.1", springBootVersion());
     }
 
     @Test
     @ClasspathReplacer({
-        @Action(verb = ADD, value = "org.springframework.boot:spring-boot:3.0.1"),
-        @Action(verb = ADD, value = "org.springframework.boot:spring-boot:3.0.0"),
+        @Action(verb = ADD, value = "org.springframework.boot:spring-boot:2.7.1"),
+        @Action(verb = ADD, value = "org.springframework.boot:spring-boot:2.7.0"),
     })
     void versionShouldBe3_0_0_whenAdd3_0_1_thenAdd3_0_0() {
-        assertEquals("3.0.0", springBootVersion());
+        assertEquals("2.7.0", springBootVersion());
     }
 
     private static String springBootVersion() {

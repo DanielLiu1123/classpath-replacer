@@ -1,6 +1,7 @@
 package com.freemanan.cr.core.framework.packager;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -34,7 +35,7 @@ public class PackagerHolder {
      * @return all packagers
      */
     public static List<Packager> getPackagers() {
-        return List.copyOf(packagers);
+        return Collections.unmodifiableList(packagers);
     }
 
     private static boolean isPresent(String className) {

@@ -6,7 +6,9 @@ dependencies {
     api("org.junit.jupiter:junit-jupiter")
     api("org.junit.platform:junit-platform-launcher")
 
-    testImplementation("ch.qos.logback:logback-classic:1.4.5")
+    testImplementation("ch.qos.logback:logback-classic:${logbackVersion}"){
+        exclude(group: "org.slf4j", module: "slf4j-api")
+    }
 }
 
 apply from: "$rootDir/deploy.gradle"
