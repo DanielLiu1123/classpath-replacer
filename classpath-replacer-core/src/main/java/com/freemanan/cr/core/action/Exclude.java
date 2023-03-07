@@ -4,6 +4,7 @@ import static com.freemanan.cr.core.util.Const.JAR_FILE_NAME_PATTERN;
 import static com.freemanan.cr.core.util.Const.MAVEN_COORDINATE_PATTERN;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -30,7 +31,7 @@ public class Exclude {
      * <p> 2. Maven coordinate pattern, like {@code com.google.code.gson:gson:2.8.6} or {@code com.google.code.gson:gson} (without version will exclude all versions)
      */
     public List<String> patterns() {
-        return List.copyOf(patterns);
+        return Collections.unmodifiableList(patterns);
     }
 
     /**
@@ -53,7 +54,7 @@ public class Exclude {
             }
         }
         Exclude exclude = new Exclude();
-        exclude.patterns.addAll(List.copyOf(patternList));
+        exclude.patterns.addAll(patternList);
         return exclude;
     }
 }

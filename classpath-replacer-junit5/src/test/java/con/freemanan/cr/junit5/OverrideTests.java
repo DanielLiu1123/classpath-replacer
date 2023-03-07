@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
  */
 @ClasspathReplacer({
     @Action(verb = ADD, value = "org.springframework.boot:spring-boot:2.7.0"),
-    @Action(verb = OVERRIDE, value = "org.springframework.boot:spring-boot:3.0.0"),
+    @Action(verb = OVERRIDE, value = "org.springframework.boot:spring-boot:2.7.1"),
 })
 public class OverrideTests {
 
@@ -21,6 +21,6 @@ public class OverrideTests {
     void testSpringBootHasBeenOverride() throws Exception {
         Class<?> sbv = Class.forName("org.springframework.boot.SpringBootVersion");
         Object version = sbv.getDeclaredMethod("getVersion").invoke(null);
-        assertEquals("3.0.0", version);
+        assertEquals("2.7.1", version);
     }
 }

@@ -111,10 +111,17 @@ public class ClasspathReplacerExtension implements InvocationInterceptor {
         ModifiedClassPathClassLoaderGenerator generator = ModifiedClassPathClassLoaderGenerator.of(originalClassLoader);
         for (Action action : actions) {
             switch (action.verb()) {
-                case ADD -> generator.add(action.value());
-                case EXCLUDE -> generator.exclude(action.value());
-                case OVERRIDE -> generator.override(action.value());
-                default -> throw new IllegalStateException("Unexpected value: " + action.verb());
+                case ADD:
+                    generator.add(action.value());
+                    break;
+                case EXCLUDE:
+                    generator.exclude(action.value());
+                    break;
+                case OVERRIDE:
+                    generator.override(action.value());
+                    break;
+                default:
+                    throw new IllegalStateException("Unexpected value: " + action.verb());
             }
         }
         generator.classpathReplacer(cr);
@@ -143,7 +150,7 @@ public class ClasspathReplacerExtension implements InvocationInterceptor {
 
     private Method findMethod(Class<?> testClass, String testMethodName) {
         Optional<Method> method = ReflectionUtils.findMethod(testClass, testMethodName);
-        if (method.isEmpty()) {
+        if (!method.isPresent()) {
             Method[] methods = Reflections.getUniqueDeclaredMethods(testClass);
             for (Method candidate : methods) {
                 if (candidate.getName().equals(testMethodName)) {

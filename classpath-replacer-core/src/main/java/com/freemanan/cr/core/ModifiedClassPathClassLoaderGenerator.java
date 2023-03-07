@@ -26,6 +26,7 @@ import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.eclipse.aether.DefaultRepositorySystemSession;
@@ -96,27 +97,27 @@ public class ModifiedClassPathClassLoaderGenerator {
                         List::add,
                         List::addAll); // we may have some exclude actions, LinkedList is better
         actions.forEach(action -> {
-            if (action instanceof Exclude exclude) {
-                exclude(result, exclude);
-            } else if (action instanceof Add add) {
-                add(result, add);
-            } else if (action instanceof Override override) {
-                override(result, override);
+            if (action instanceof Exclude) {
+                exclude(result, (Exclude) action);
+            } else if (action instanceof Add) {
+                add(result, (Add) action);
+            } else if (action instanceof Override) {
+                override(result, (Override) action);
             } else {
                 throw new IllegalArgumentException("Unknown action: " + action);
             }
         });
-        return new ModifiedClassPathClassLoader(result.toArray(URL[]::new), parent.getParent(), parent);
+        return new ModifiedClassPathClassLoader(result.toArray(new URL[0]), parent.getParent(), parent);
     }
 
     private void override(List<URL> result, Override override) {
         // have same behavior as add
-        add(result, Add.of(override.coordinates().toArray(String[]::new)));
+        add(result, Add.of(override.coordinates().toArray(new String[0])));
     }
 
     private void add(List<URL> result, Add add) {
         List<String> coordinates =
-                add.coordinates().stream().sorted(Comparator.reverseOrder()).toList();
+                add.coordinates().stream().sorted(Comparator.reverseOrder()).collect(Collectors.toList());
         // Add to the beginning of the list to make sure the added jars are loaded first.
         result.addAll(0, getAdditionalUrls(coordinates));
     }
@@ -172,7 +173,7 @@ public class ModifiedClassPathClassLoaderGenerator {
                 String regex = String.format("%s-.*\\.jar", artifactId);
                 return Pattern.matches(regex, fileName(url));
             }
-            return patternToVersionsSupplier.get().getOrDefault(pattern, List.of()).stream()
+            return patternToVersionsSupplier.get().getOrDefault(pattern, Collections.emptyList()).stream()
                     .anyMatch(version -> {
                         String coordinate = pattern + ":" + version;
                         return patternToJars
@@ -241,8 +242,8 @@ public class ModifiedClassPathClassLoaderGenerator {
     }
 
     private static Stream<URL> doExtractUrls(ClassLoader classLoader) {
-        if (classLoader instanceof URLClassLoader urlClassLoader) {
-            return Stream.of(urlClassLoader.getURLs());
+        if (classLoader instanceof URLClassLoader) {
+            return Stream.of(((URLClassLoader) classLoader).getURLs());
         }
         return Stream.of(ManagementFactory.getRuntimeMXBean().getClassPath().split(File.pathSeparator))
                 .map(ModifiedClassPathClassLoaderGenerator::toURL);
@@ -352,16 +353,16 @@ public class ModifiedClassPathClassLoaderGenerator {
 
     private static List<RemoteRepository> extraRepositories(ClasspathReplacer classpathReplacer) {
         if (classpathReplacer == null) {
-            return List.of();
+            return Collections.emptyList();
         }
         List<RemoteRepository> extraRepositories = new ArrayList<>(classpathReplacer.repositories().length);
         for (Repository repo : classpathReplacer.repositories()) {
-            String id = (repo.id() == null || repo.id().isBlank()) ? repo.value() : repo.id();
+            String id = (repo.id() == null || repo.id().isEmpty()) ? repo.value() : repo.id();
             String url = repo.value();
             RemoteRepository.Builder builder = new RemoteRepository.Builder(id, "default", url);
             String username = parseIfNecessary(repo.username());
             String password = parseIfNecessary(repo.password());
-            if (username != null && !username.isBlank() && password != null && !password.isBlank()) {
+            if (username != null && !username.isEmpty() && password != null && !password.isEmpty()) {
                 builder.setAuthentication(new AuthenticationBuilder()
                         .addUsername(username)
                         .addPassword(password)
@@ -374,7 +375,7 @@ public class ModifiedClassPathClassLoaderGenerator {
     }
 
     private static String parseIfNecessary(String str) {
-        if (str == null || str.isBlank()) {
+        if (str == null || str.isEmpty()) {
             return str;
         }
         if (str.startsWith("${") && str.endsWith("}")) {

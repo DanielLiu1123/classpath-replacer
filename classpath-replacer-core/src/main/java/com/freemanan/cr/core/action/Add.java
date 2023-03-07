@@ -3,6 +3,7 @@ package com.freemanan.cr.core.action;
 import static com.freemanan.cr.core.util.Const.MAVEN_COORDINATE_WITH_VERSION_PATTERN;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -15,7 +16,7 @@ public class Add {
     private Add() {}
 
     public List<String> coordinates() {
-        return List.copyOf(coordinates);
+        return Collections.unmodifiableList(coordinates);
     }
 
     public static Add of(String... coordinates) {
@@ -28,7 +29,7 @@ public class Add {
             }
         }
         Add add = new Add();
-        add.coordinates.addAll(List.copyOf(validCoordinates));
+        add.coordinates.addAll(validCoordinates);
         return add;
     }
 }

@@ -12,8 +12,8 @@ import org.junit.jupiter.api.Test;
 
 @ClasspathReplacer({
     @Action(verb = ADD, value = "org.springframework.boot:spring-boot:2.7.0"),
-    @Action(verb = OVERRIDE, value = "org.springframework.boot:spring-boot:3.0.0"),
-    @Action(verb = EXCLUDE, value = "spring-boot-3.0.0.jar"),
+    @Action(verb = OVERRIDE, value = "org.springframework.boot:spring-boot:2.7.1"),
+    @Action(verb = EXCLUDE, value = "spring-boot-2.7.1.jar"),
 })
 public class ClasspathReplacerMethodLevelTests {
 
@@ -21,18 +21,18 @@ public class ClasspathReplacerMethodLevelTests {
     void testVersionIs270_whenAdd270ThenOverrideWith300ThenExclude300() throws Exception {
         Class<?> sbv = Class.forName("org.springframework.boot.SpringBootVersion");
         Object version = sbv.getDeclaredMethod("getVersion").invoke(null);
-        assertNotEquals("3.0.0", version);
+        assertNotEquals("2.7.1", version);
         assertEquals("2.7.0", version);
     }
 
     @Test
     @ClasspathReplacer({
-        @Action(verb = ADD, value = "org.springframework.boot:spring-boot:3.0.0"),
+        @Action(verb = ADD, value = "org.springframework.boot:spring-boot:2.7.1"),
     })
     void testVersionIs300_whenAdd300() throws Exception {
         Class<?> sbv = Class.forName("org.springframework.boot.SpringBootVersion");
         Object version = sbv.getDeclaredMethod("getVersion").invoke(null);
         assertNotEquals("2.7.0", version);
-        assertEquals("3.0.0", version);
+        assertEquals("2.7.1", version);
     }
 }

@@ -1,15 +1,12 @@
 package com.example;
 
 import static com.freemanan.cr.core.anno.Verb.ADD;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.freemanan.cr.core.anno.Action;
 import com.freemanan.cr.core.anno.ClasspathReplacer;
-import java.lang.reflect.InaccessibleObjectException;
-import java.util.Collections;
 import org.junit.jupiter.api.Test;
 
 class JsonUtilTest {
@@ -39,21 +36,5 @@ class JsonUtilTest {
     })
     void useJacksonFirst_whenBothJacksonAndGsonOnClasspath() {
         assertTrue(JsonUtil.instance() instanceof Jackson);
-    }
-
-    @Test
-    @ClasspathReplacer({@Action(verb = ADD, value = "com.google.code.gson:gson:2.8.9")})
-    void gsonHasBugOn2_8_9_whenEmptyList() {
-        assertThrows(InaccessibleObjectException.class, () -> {
-            JsonUtil.toJson(Collections.emptyList());
-        });
-    }
-
-    @Test
-    @ClasspathReplacer({@Action(verb = ADD, value = "com.google.code.gson:gson:2.9.0")})
-    void gsonWorksFineOn2_9_0_whenEmptyList() {
-        assertDoesNotThrow(() -> {
-            JsonUtil.toJson(Collections.emptyList());
-        });
     }
 }
