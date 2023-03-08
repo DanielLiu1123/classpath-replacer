@@ -3,6 +3,7 @@ package com.freemanan.cr.core.util;
 import static com.freemanan.cr.core.util.Const.JAR_FILE_NAME_PATTERN;
 import static com.freemanan.cr.core.util.Const.MAVEN_COORDINATE_PATTERN;
 import static com.freemanan.cr.core.util.Const.MAVEN_COORDINATE_WITH_VERSION_PATTERN;
+import static com.freemanan.cr.core.util.Const.VERSION_PATTERN;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -29,5 +30,11 @@ class ConstTest {
         assertFalse("gson-2.9.0".matches(JAR_FILE_NAME_PATTERN));
         assertTrue("gson-2.9.0.jar".matches(JAR_FILE_NAME_PATTERN));
         assertTrue("gson-2.9.0-javadoc.jar".matches(JAR_FILE_NAME_PATTERN));
+
+        assertTrue("2.9.0".matches(VERSION_PATTERN));
+        assertTrue("2.9.0-SNAPSHOT".matches(VERSION_PATTERN));
+        assertTrue("2.9.0-RC1".matches(VERSION_PATTERN));
+        assertTrue("Hoxton.SR12".matches(VERSION_PATTERN));
+        assertFalse("api-2.9.0".matches(VERSION_PATTERN));
     }
 }

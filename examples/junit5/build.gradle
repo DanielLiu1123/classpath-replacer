@@ -4,7 +4,12 @@ dependencies {
     compileOnly("com.fasterxml.jackson.core:jackson-databind:2.14.1")
     compileOnly("com.google.code.gson:gson:2.10.1")
 
-    testImplementation("ch.qos.logback:logback-classic:${logbackVersion}"){
+    testImplementation("ch.qos.logback:logback-classic:${logbackVersion}") {
         exclude(group: "org.slf4j", module: "slf4j-api")
+    }
+
+    // just for testing
+    testImplementation('org.apache.pulsar:pulsar-client:2.11.0') {
+        exclude(group: "org.apache.logging.log4j")
     }
 }

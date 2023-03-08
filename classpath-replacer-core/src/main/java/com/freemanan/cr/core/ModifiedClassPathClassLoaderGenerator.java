@@ -92,10 +92,8 @@ public class ModifiedClassPathClassLoaderGenerator {
     public ModifiedClassPathClassLoader gen() {
         URL[] urls = extractUrls(parent);
         List<URL> result = Arrays.stream(urls)
-                .collect(
-                        LinkedList::new,
-                        List::add,
-                        List::addAll); // we may have some exclude actions, LinkedList is better
+                .collect(Collectors.toCollection(
+                        LinkedList::new)); // we may have some exclude actions, LinkedList is better
         actions.forEach(action -> {
             if (action instanceof Exclude) {
                 exclude(result, (Exclude) action);
@@ -162,7 +160,7 @@ public class ModifiedClassPathClassLoaderGenerator {
             return patternToJars
                     .computeIfAbsent(pattern, s -> resolveCoordinates(new String[] {pattern}, classpathReplacer))
                     .stream()
-                    .anyMatch(jarPath -> Objects.equals(jarPath.toString(), url.toString()));
+                    .anyMatch(jarPath -> isSameJar(url, jarPath));
         }
 
         // like com.google.code.gson:gson
@@ -170,8 +168,22 @@ public class ModifiedClassPathClassLoaderGenerator {
             if (!recursiveExclude) {
                 String[] gav = pattern.split(":");
                 String artifactId = gav[1];
-                String regex = String.format("%s-.*\\.jar", artifactId);
-                return Pattern.matches(regex, fileName(url));
+
+                // like gson-2.8.6.jar
+                String fileName = fileName(url);
+                if (fileName == null || !fileName.startsWith(artifactId)) {
+                    return false;
+                }
+
+                // extract version
+                String version = fileName.substring(artifactId.length() + 1, fileName.length() - 4);
+                // it may be api-1.0.0
+                if (!version.matches(Const.VERSION_PATTERN)) {
+                    return false;
+                }
+
+                String file = String.format("%s-%s.jar", artifactId, version);
+                return file.equals(fileName);
             }
             return patternToVersionsSupplier.get().getOrDefault(pattern, Collections.emptyList()).stream()
                     .anyMatch(version -> {
@@ -181,7 +193,7 @@ public class ModifiedClassPathClassLoaderGenerator {
                                         coordinate,
                                         s -> resolveCoordinates(new String[] {coordinate}, classpathReplacer))
                                 .stream()
-                                .anyMatch(jarPath -> Objects.equals(jarPath.toString(), url.toString()));
+                                .anyMatch(jarPath -> isSameJar(url, jarPath));
                     });
         }
 
@@ -200,6 +212,54 @@ public class ModifiedClassPathClassLoaderGenerator {
         throw new IllegalArgumentException("Illegal pattern: " + pattern);
     }
 
+    private static boolean isSameJar(URL url, URL mavenJarUrl) {
+        // if gradle project, jar cache path is like
+        // ~/.gradle/caches/modules-2/files-2.1/com.google.code.gson/gson/2.8.6/3f7e1e9e8e1b0e1e8e1b0e1b0e1b0e1b0e1b0e1b/gson-2.8.6.jar
+        // if maven project, jar cache path is like ~/.m2/repository/com/google/code/gson/gson/2.8.6/gson-2.8.6.jar
+        if (url == null || mavenJarUrl == null) {
+            return false;
+        }
+
+        if (Objects.equals(url, mavenJarUrl)) {
+            return true;
+        }
+
+        // compare file name
+        String fileName = fileName(url);
+        if (fileName == null) {
+            return false;
+        }
+        String jarFileName = fileName(mavenJarUrl);
+        if (!Objects.equals(fileName, jarFileName)) {
+            return false;
+        }
+
+        // compare group id
+        // remove the last 3 '/' for maven jar path
+        String urlStr = url.toString();
+        String mavenJarStr = mavenJarUrl.toString();
+        String temp = mavenJarStr.substring(0, mavenJarStr.lastIndexOf("/"));
+        temp = temp.substring(0, temp.lastIndexOf("/"));
+        String[] arr = temp.substring(0, temp.lastIndexOf("/")).split("/");
+
+        // gradle
+        String gradlePartGroupId = arr[arr.length - 2] + "." + arr[arr.length - 1];
+        if (urlStr.contains(gradlePartGroupId)) {
+            return true;
+        }
+
+        // maven
+        String mavenPartGroupId = arr[arr.length - 2] + "/" + arr[arr.length - 1];
+        if (urlStr.contains(mavenPartGroupId)) {
+            return true;
+        }
+
+        // TODO: here to support the other project types, non maven and non gradle
+
+        // artifact id is the same, but group id is different
+        return false;
+    }
+
     private static List<String> findVersions(List<URL> urls, String groupAndArtifact) {
         List<String> versions = new ArrayList<>();
         for (URL url : urls) {
@@ -212,7 +272,10 @@ public class ModifiedClassPathClassLoaderGenerator {
             String regex = String.format("%s-(.*)\\.jar", artifactId);
             Matcher matcher = Pattern.compile(regex).matcher(fileName);
             if (matcher.find()) {
-                versions.add(matcher.group(1));
+                String version = matcher.group(1);
+                if (version.matches(Const.VERSION_PATTERN)) {
+                    versions.add(version);
+                }
             }
         }
         return versions;
