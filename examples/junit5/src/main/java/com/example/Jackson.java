@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Freeman
- * @since 2023/2/12
  */
 public class Jackson implements JSON {
 

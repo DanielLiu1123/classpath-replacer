@@ -2,7 +2,6 @@ package com.freemanan.cr.core.anno;
 
 /**
  * @author Freeman
- * @since 2023/2/12
  */
 public enum Verb {
     /**
