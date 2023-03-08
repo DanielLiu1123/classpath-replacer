@@ -49,6 +49,8 @@ Maven:
 </dependency>
 ```
 
+NOTE: from version `2.0.0`, `classpath-replacer` supports JDK 8, the previous version only supports JDK 17.
+
 `@ClasspathReplacer` is the core annotation of this framework. It can be used on the test class or test method.
 
 You can define your classpath replacement rules in `@ClasspathReplacer`, which consists of `@Action`, each `@Action`
