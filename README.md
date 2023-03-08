@@ -34,7 +34,7 @@ Classpath Replacer can help you simulate this scenario in your unit tests.
 Gradle:
 
 ```groovy
-testImplementation 'com.freemanan:classpath-replacer-junit5:1.2.0'
+testImplementation 'com.freemanan:classpath-replacer-junit5:2.0.0'
 ```
 
 Maven:
@@ -44,7 +44,7 @@ Maven:
 <dependency>
     <groupId>com.freemanan</groupId>
     <artifactId>classpath-replacer-junit5</artifactId>
-    <version>1.2.0</version>
+    <version>2.0.0</version>
     <scope>test</scope>
 </dependency>
 ```
@@ -150,22 +150,6 @@ class JsonUtilTest {
     })
     void useJacksonFirst_whenBothJacksonAndGsonOnClasspath() {
         assertTrue(JsonUtil.instance() instanceof Jackson);
-    }
-
-    @Test
-    @ClasspathReplacer({@Action(verb = ADD, value = "com.google.code.gson:gson:2.8.9")})
-    void gsonHasBugOn2_8_9_whenEmptyList() {
-        assertThrows(InaccessibleObjectException.class, () -> {
-            JsonUtil.toJson(Collections.emptyList());
-        });
-    }
-
-    @Test
-    @ClasspathReplacer({@Action(verb = ADD, value = "com.google.code.gson:gson:2.9.0")})
-    void gsonWorksFineOn2_9_0_whenEmptyList() {
-        assertDoesNotThrow(() -> {
-            JsonUtil.toJson(Collections.emptyList());
-        });
     }
 }
 ```
