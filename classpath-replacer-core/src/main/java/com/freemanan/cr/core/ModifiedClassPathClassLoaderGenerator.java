@@ -155,7 +155,12 @@ public class ModifiedClassPathClassLoaderGenerator {
                 String artifactId = gav[1];
                 String version = gav[2];
                 String jarName = artifactId + "-" + version + ".jar";
-                return jarName.equals(fileName(url));
+                if (!Objects.equals(jarName, fileName(url))) {
+                    return false;
+                }
+                // compare group id
+                String[] groupArr = gav[0].split("\\.");
+                return isSameGroupIdWithExactMatch(url, groupArr);
             }
             return patternToJars
                     .computeIfAbsent(pattern, s -> resolveCoordinates(new String[] {pattern}, classpathReplacer))
@@ -213,9 +218,6 @@ public class ModifiedClassPathClassLoaderGenerator {
     }
 
     private static boolean isSameJar(URL url, URL mavenJarUrl) {
-        // if gradle project, jar cache path is like
-        // ~/.gradle/caches/modules-2/files-2.1/com.google.code.gson/gson/2.8.6/3f7e1e9e8e1b0e1e8e1b0e1b0e1b0e1b0e1b0e1b/gson-2.8.6.jar
-        // if maven project, jar cache path is like ~/.m2/repository/com/google/code/gson/gson/2.8.6/gson-2.8.6.jar
         if (url == null || mavenJarUrl == null) {
             return false;
         }
@@ -236,20 +238,61 @@ public class ModifiedClassPathClassLoaderGenerator {
 
         // compare group id
         // remove the last 3 '/' for maven jar path
-        String urlStr = url.toString();
         String mavenJarStr = mavenJarUrl.toString();
         String temp = mavenJarStr.substring(0, mavenJarStr.lastIndexOf("/"));
         temp = temp.substring(0, temp.lastIndexOf("/"));
         String[] arr = temp.substring(0, temp.lastIndexOf("/")).split("/");
+        return isSameGroupIdWithFuzzyMatch(url, arr);
+    }
 
-        // gradle
-        String gradlePartGroupId = arr[arr.length - 2] + "." + arr[arr.length - 1];
+    /**
+     * Only take the last 2 elements of the group id array to compare.
+     *
+     * @param url jar url
+     * @param groupIdArr maven group id array, e.g. [com, google, code, gson]
+     * @return true if the group id is same
+     */
+    private static boolean isSameGroupIdWithFuzzyMatch(URL url, String[] groupIdArr) {
+        String urlStr = url.toString();
+
+        // gradle project, jar cache path is like
+        // ~/.gradle/caches/modules-2/files-2.1/com.google.code.gson/gson/2.8.6/3f7e1e9e8e1b0e1e8e1b0e1b0e1b0e1b0e1b0e1b/gson-2.8.6.jar
+        String gradlePartGroupId = groupIdArr[groupIdArr.length - 2] + "." + groupIdArr[groupIdArr.length - 1];
         if (urlStr.contains(gradlePartGroupId)) {
             return true;
         }
 
-        // maven
-        String mavenPartGroupId = arr[arr.length - 2] + "/" + arr[arr.length - 1];
+        // maven project, jar cache path is like ~/.m2/repository/com/google/code/gson/gson/2.8.6/gson-2.8.6.jar
+        String mavenPartGroupId = groupIdArr[groupIdArr.length - 2] + "/" + groupIdArr[groupIdArr.length - 1];
+        if (urlStr.contains(mavenPartGroupId)) {
+            return true;
+        }
+
+        // TODO: here to support the other project types, non maven and non gradle
+
+        // artifact id is the same, but group id is different
+        return false;
+    }
+
+    /**
+     * Url must contain all the elements in groupIdArr.
+     *
+     * @param url jar url
+     * @param groupIdArr maven group id array, e.g. [com, google, code, gson]
+     * @return true if the group id is same
+     */
+    private static boolean isSameGroupIdWithExactMatch(URL url, String[] groupIdArr) {
+        String urlStr = url.toString();
+
+        // gradle project, jar cache path is like
+        // ~/.gradle/caches/modules-2/files-2.1/com.google.code.gson/gson/2.8.6/3f7e1e9e8e1b0e1e8e1b0e1b0e1b0e1b0e1b0e1b/gson-2.8.6.jar
+        String gradlePartGroupId = "/" + String.join(".", groupIdArr) + "/";
+        if (urlStr.contains(gradlePartGroupId)) {
+            return true;
+        }
+
+        // maven project, jar cache path is like ~/.m2/repository/com/google/code/gson/gson/2.8.6/gson-2.8.6.jar
+        String mavenPartGroupId = "/" + String.join("/", groupIdArr) + "/";
         if (urlStr.contains(mavenPartGroupId)) {
             return true;
         }
