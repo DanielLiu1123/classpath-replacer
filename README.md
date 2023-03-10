@@ -34,7 +34,7 @@ Classpath Replacer can help you simulate this scenario in your unit tests.
 Gradle:
 
 ```groovy
-testImplementation 'com.freemanan:classpath-replacer-junit5:2.0.0'
+testImplementation 'com.freemanan:classpath-replacer-junit5:2.1.0'
 ```
 
 Maven:
@@ -44,12 +44,12 @@ Maven:
 <dependency>
     <groupId>com.freemanan</groupId>
     <artifactId>classpath-replacer-junit5</artifactId>
-    <version>2.0.0</version>
+    <version>2.1.0</version>
     <scope>test</scope>
 </dependency>
 ```
 
-NOTE: from version `2.0.0`, `classpath-replacer` supports JDK 8, the previous version only supports JDK 17.
+NOTE: from version `2.0.0`, `classpath-replacer` supports JDK 8, the previous versions only support JDK 17.
 
 `@ClasspathReplacer` is the core annotation of this framework. It can be used on the test class or test method.
 
