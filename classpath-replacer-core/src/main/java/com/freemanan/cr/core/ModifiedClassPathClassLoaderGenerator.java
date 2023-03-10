@@ -135,15 +135,13 @@ public class ModifiedClassPathClassLoaderGenerator {
         if (pattern.matches(Const.MAVEN_COORDINATE_WITH_VERSION_PATTERN)) {
             if (!recursiveExclude) {
                 String[] gav = pattern.split(":");
-                String artifactId = gav[1];
-                String version = gav[2];
-                String jarName = artifactId + "-" + version + ".jar";
-                if (!Objects.equals(jarName, fileName(url))) {
+                if (!isSameGroupIdWithExactMatch(url, gav[0].split("\\."))) {
                     return false;
                 }
-                // compare group id
-                String[] groupArr = gav[0].split("\\.");
-                return isSameGroupIdWithExactMatch(url, groupArr);
+                String artifactId = gav[1];
+                String version = gav[2];
+                String jarName = String.format("%s-%s.jar", artifactId, version);
+                return Objects.equals(jarName, fileName(url));
             }
             return patternToJars
                     .computeIfAbsent(pattern, s -> resolveCoordinates(new String[] {pattern}, classpathReplacer))
@@ -171,12 +169,7 @@ public class ModifiedClassPathClassLoaderGenerator {
                 // extract version
                 String version = fileName.substring(artifactId.length() + 1, fileName.length() - 4);
                 // it may be api-1.0.0
-                if (!version.matches(Const.VERSION_PATTERN)) {
-                    return false;
-                }
-
-                String file = String.format("%s-%s.jar", artifactId, version);
-                return file.equals(fileName);
+                return version.matches(Const.VERSION_PATTERN);
             }
             return patternToVersionsSupplier.get().getOrDefault(pattern, Collections.emptyList()).stream()
                     .anyMatch(version -> {
