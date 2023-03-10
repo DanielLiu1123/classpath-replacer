@@ -1,10 +1,11 @@
 package com.freemanan.cr.core;
 
+import static com.freemanan.cr.core.util.MavenUtils.resolveCoordinates;
+
 import com.freemanan.cr.core.action.Add;
 import com.freemanan.cr.core.action.Exclude;
 import com.freemanan.cr.core.action.Override;
 import com.freemanan.cr.core.anno.ClasspathReplacer;
-import com.freemanan.cr.core.anno.Repository;
 import com.freemanan.cr.core.util.Const;
 import java.io.File;
 import java.lang.management.ManagementFactory;
@@ -28,30 +29,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
-import org.eclipse.aether.DefaultRepositorySystemSession;
-import org.eclipse.aether.RepositorySystem;
-import org.eclipse.aether.artifact.DefaultArtifact;
-import org.eclipse.aether.collection.CollectRequest;
-import org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory;
-import org.eclipse.aether.graph.Dependency;
-import org.eclipse.aether.impl.DefaultServiceLocator;
-import org.eclipse.aether.repository.LocalRepository;
-import org.eclipse.aether.repository.RemoteRepository;
-import org.eclipse.aether.resolution.ArtifactResult;
-import org.eclipse.aether.resolution.DependencyRequest;
-import org.eclipse.aether.resolution.DependencyResult;
-import org.eclipse.aether.spi.connector.RepositoryConnectorFactory;
-import org.eclipse.aether.spi.connector.transport.TransporterFactory;
-import org.eclipse.aether.transport.http.HttpTransporterFactory;
-import org.eclipse.aether.util.repository.AuthenticationBuilder;
 
 /**
  * @author Freeman
  */
 public class ModifiedClassPathClassLoaderGenerator {
     private static final Pattern INTELLIJ_CLASSPATH_JAR_PATTERN = Pattern.compile(".*classpath(\\d+)?\\.jar");
-    private static final int MAX_RESOLUTION_ATTEMPTS = 3;
 
     private final List<Object> actions = new LinkedList<>();
     private final ClassLoader parent;
@@ -172,6 +155,11 @@ public class ModifiedClassPathClassLoaderGenerator {
         if (pattern.matches(Const.MAVEN_COORDINATE_PATTERN)) {
             if (!recursiveExclude) {
                 String[] gav = pattern.split(":");
+
+                if (!isSameGroupIdWithExactMatch(url, gav[0].split("\\."))) {
+                    return false;
+                }
+
                 String artifactId = gav[1];
 
                 // like gson-2.8.6.jar
@@ -248,7 +236,7 @@ public class ModifiedClassPathClassLoaderGenerator {
     /**
      * Only take the last 2 elements of the group id array to compare.
      *
-     * @param url jar url
+     * @param url        jar url
      * @param groupIdArr maven group id array, e.g. [com, google, code, gson]
      * @return true if the group id is same
      */
@@ -277,7 +265,7 @@ public class ModifiedClassPathClassLoaderGenerator {
     /**
      * Url must contain all the elements in groupIdArr.
      *
-     * @param url jar url
+     * @param url        jar url
      * @param groupIdArr maven group id array, e.g. [com, google, code, gson]
      * @return true if the group id is same
      */
@@ -311,6 +299,9 @@ public class ModifiedClassPathClassLoaderGenerator {
                 continue;
             }
             String[] ga = groupAndArtifact.split(":");
+            if (!isSameGroupIdWithExactMatch(url, ga[0].split("\\."))) {
+                continue;
+            }
             String artifactId = ga[1];
             String regex = String.format("%s-(.*)\\.jar", artifactId);
             Matcher matcher = Pattern.compile(regex).matcher(fileName);
@@ -410,97 +401,5 @@ public class ModifiedClassPathClassLoaderGenerator {
             return Collections.emptyList();
         }
         return resolveCoordinates(coordinates.toArray(new String[0]), classpathReplacer);
-    }
-
-    /**
-     * Resolves Maven coordinates to a list of URLs.
-     *
-     * @param coordinates       Maven coordinates of the form groupId:artifactId:version
-     * @param classpathReplacer classpath replacer, nullable
-     * @return list of URLs to the resolved artifacts
-     */
-    public static List<URL> resolveCoordinates(String[] coordinates, ClasspathReplacer classpathReplacer) {
-        DefaultServiceLocator serviceLocator = MavenRepositorySystemUtils.newServiceLocator();
-        serviceLocator.addService(RepositoryConnectorFactory.class, BasicRepositoryConnectorFactory.class);
-        serviceLocator.addService(TransporterFactory.class, HttpTransporterFactory.class);
-        RepositorySystem repositorySystem = serviceLocator.getService(RepositorySystem.class);
-
-        DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
-        LocalRepository localRepository = new LocalRepository(System.getProperty("user.home") + "/.m2/repository");
-        session.setLocalRepositoryManager(repositorySystem.newLocalRepositoryManager(session, localRepository));
-        Exception latestFailure = null;
-        for (int i = 0; i < MAX_RESOLUTION_ATTEMPTS; i++) {
-            CollectRequest collectRequest = new CollectRequest(null, allRepositories(classpathReplacer));
-            collectRequest.setDependencies(createDependencies(coordinates));
-            DependencyRequest dependencyRequest = new DependencyRequest(collectRequest, null);
-            try {
-                DependencyResult result = repositorySystem.resolveDependencies(session, dependencyRequest);
-                List<URL> resolvedArtifacts = new ArrayList<>();
-                for (ArtifactResult artifact : result.getArtifactResults()) {
-                    resolvedArtifacts.add(
-                            artifact.getArtifact().getFile().toURI().toURL());
-                }
-                return resolvedArtifacts;
-            } catch (Exception ex) {
-                latestFailure = ex;
-            }
-        }
-        throw new IllegalStateException(
-                "Resolution failed after " + MAX_RESOLUTION_ATTEMPTS + " attempts", latestFailure);
-    }
-
-    private static List<RemoteRepository> allRepositories(ClasspathReplacer classpathReplacer) {
-        List<RemoteRepository> extra = extraRepositories(classpathReplacer);
-        RemoteRepository central = centralRepository();
-        List<RemoteRepository> result = new ArrayList<>(extra);
-        result.add(central);
-        return result;
-    }
-
-    private static List<RemoteRepository> extraRepositories(ClasspathReplacer classpathReplacer) {
-        if (classpathReplacer == null) {
-            return Collections.emptyList();
-        }
-        List<RemoteRepository> extraRepositories = new ArrayList<>(classpathReplacer.repositories().length);
-        for (Repository repo : classpathReplacer.repositories()) {
-            String id = (repo.id() == null || repo.id().isEmpty()) ? repo.value() : repo.id();
-            String url = repo.value();
-            RemoteRepository.Builder builder = new RemoteRepository.Builder(id, "default", url);
-            String username = parseIfNecessary(repo.username());
-            String password = parseIfNecessary(repo.password());
-            if (username != null && !username.isEmpty() && password != null && !password.isEmpty()) {
-                builder.setAuthentication(new AuthenticationBuilder()
-                        .addUsername(username)
-                        .addPassword(password)
-                        .build());
-            }
-            RemoteRepository repository = builder.build();
-            extraRepositories.add(repository);
-        }
-        return extraRepositories;
-    }
-
-    private static String parseIfNecessary(String str) {
-        if (str == null || str.isEmpty()) {
-            return str;
-        }
-        if (str.startsWith("${") && str.endsWith("}")) {
-            String variable = str.substring(2, str.length() - 1);
-            String v = Optional.ofNullable(System.getenv(variable)).orElse(System.getProperty(variable));
-            return v != null ? v : str;
-        }
-        return str;
-    }
-
-    private static RemoteRepository centralRepository() {
-        return new RemoteRepository.Builder("central", "default", "https://repo.maven.apache.org/maven2").build();
-    }
-
-    private static List<Dependency> createDependencies(String[] coordinates) {
-        List<Dependency> dependencies = new ArrayList<>();
-        for (String coordinate : coordinates) {
-            dependencies.add(new Dependency(new DefaultArtifact(coordinate), null));
-        }
-        return dependencies;
     }
 }

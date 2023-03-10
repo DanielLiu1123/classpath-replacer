@@ -38,4 +38,28 @@ class ExcludeTest {
             Class.forName("org.springframework.cloud.bootstrap.marker.Marker");
         });
     }
+
+    @Test
+    @ClasspathReplacer({
+        @Action(verb = ADD, value = "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.5"),
+        @Action(verb = EXCLUDE, value = "org.spring:spring-cloud-starter-bootstrap"), // different group id
+    })
+    void notExclude_whenDifferentGroupIdWithoutVersion() {
+        assertDoesNotThrow(() -> {
+            Class.forName("org.springframework.cloud.bootstrap.marker.Marker");
+        });
+    }
+
+    @Test
+    @ClasspathReplacer(
+            value = {
+                @Action(verb = ADD, value = "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.5"),
+                @Action(verb = EXCLUDE, value = "org.spring:spring-cloud-starter-bootstrap"), // different group id
+            },
+            recursiveExclude = true)
+    void notExclude_whenDifferentGroupIdWithRecursiveExclude() {
+        assertDoesNotThrow(() -> {
+            Class.forName("org.springframework.cloud.bootstrap.marker.Marker");
+        });
+    }
 }
