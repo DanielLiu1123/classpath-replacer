@@ -51,6 +51,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
  * <p> When add new dependencies, there may be dependency conflicts. For example, the log framework used by the current program is {@code logback}, and the added dependency using {@code log4j}.
  * Therefore, in complex scenarios, the ability to define the order of actions is a very important feature.
  *
+ * <p> {@link ClasspathReplacer} can be used on the class level or method level, and the method level will override the class level.
+ *
  * @author Freeman
  */
 @Retention(RetentionPolicy.RUNTIME)
