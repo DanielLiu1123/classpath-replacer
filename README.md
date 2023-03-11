@@ -34,7 +34,7 @@ Classpath Replacer can help you simulate this scenario in your unit tests.
 Gradle:
 
 ```groovy
-testImplementation 'com.freemanan:classpath-replacer-junit5:2.1.1'
+testImplementation 'com.freemanan:classpath-replacer-jupiter:2.1.1'
 ```
 
 Maven:
@@ -43,7 +43,7 @@ Maven:
 
 <dependency>
     <groupId>com.freemanan</groupId>
-    <artifactId>classpath-replacer-junit5</artifactId>
+    <artifactId>classpath-replacer-jupiter</artifactId>
     <version>2.1.1</version>
     <scope>test</scope>
 </dependency>
