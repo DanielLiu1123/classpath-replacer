@@ -22,11 +22,10 @@ public class Add {
     public static Add of(String... coordinates) {
         List<String> validCoordinates = new ArrayList<>();
         for (String coordinate : coordinates) {
-            if (coordinate.matches(MAVEN_COORDINATE_WITH_VERSION_PATTERN)) {
-                validCoordinates.add(coordinate);
-            } else {
+            if (!coordinate.matches(MAVEN_COORDINATE_WITH_VERSION_PATTERN)) {
                 throw new IllegalArgumentException("Invalid maven coordinate: " + coordinate);
             }
+            validCoordinates.add(coordinate);
         }
         Add add = new Add();
         add.coordinates.addAll(validCoordinates);

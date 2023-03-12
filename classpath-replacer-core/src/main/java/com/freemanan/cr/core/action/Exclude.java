@@ -47,11 +47,10 @@ public class Exclude {
     public static Exclude of(String... patterns) {
         List<String> patternList = new ArrayList<>();
         for (String pattern : patterns) {
-            if (pattern.matches(JAR_FILE_NAME_PATTERN) || pattern.matches(MAVEN_COORDINATE_PATTERN)) {
-                patternList.add(pattern);
-            } else {
+            if (!pattern.matches(JAR_FILE_NAME_PATTERN) && !pattern.matches(MAVEN_COORDINATE_PATTERN)) {
                 throw new IllegalArgumentException("Invalid pattern: " + pattern);
             }
+            patternList.add(pattern);
         }
         Exclude exclude = new Exclude();
         exclude.patterns.addAll(patternList);

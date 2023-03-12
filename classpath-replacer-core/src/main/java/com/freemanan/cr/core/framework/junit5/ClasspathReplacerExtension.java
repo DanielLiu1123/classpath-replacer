@@ -76,7 +76,7 @@ public class ClasspathReplacerExtension implements InvocationInterceptor {
         runTestWithModifiedClassPath(invocationContext, extensionContext);
     }
 
-    private void runTestWithModifiedClassPath(
+    private static void runTestWithModifiedClassPath(
             ReflectiveInvocationContext<Method> invocationContext, ExtensionContext extensionContext) throws Throwable {
         Class<?> testClass = extensionContext.getRequiredTestClass();
         Method testMethod = invocationContext.getExecutable();
@@ -128,7 +128,7 @@ public class ClasspathReplacerExtension implements InvocationInterceptor {
         return generator.gen();
     }
 
-    private void runTest(String testClassName, String testMethodName, ClassLoader custmizedClassLoader)
+    private static void runTest(String testClassName, String testMethodName, ClassLoader custmizedClassLoader)
             throws Throwable {
         Class<?> testClass = custmizedClassLoader.loadClass(testClassName);
         Method testMethod = findMethod(testClass, testMethodName);
@@ -148,7 +148,7 @@ public class ClasspathReplacerExtension implements InvocationInterceptor {
         }
     }
 
-    private Method findMethod(Class<?> testClass, String testMethodName) {
+    private static Method findMethod(Class<?> testClass, String testMethodName) {
         Optional<Method> method = ReflectionUtils.findMethod(testClass, testMethodName);
         if (!method.isPresent()) {
             Method[] methods = Reflections.getUniqueDeclaredMethods(testClass);
@@ -162,7 +162,7 @@ public class ClasspathReplacerExtension implements InvocationInterceptor {
         return method.get();
     }
 
-    private void intercept(Invocation<Void> invocation, ExtensionContext extensionContext) throws Throwable {
+    private static void intercept(Invocation<Void> invocation, ExtensionContext extensionContext) throws Throwable {
         if (isModifiedClassPathClassLoader(extensionContext)) {
             invocation.proceed();
             return;
@@ -170,7 +170,7 @@ public class ClasspathReplacerExtension implements InvocationInterceptor {
         invocation.skip();
     }
 
-    private boolean isModifiedClassPathClassLoader(ExtensionContext extensionContext) {
+    private static boolean isModifiedClassPathClassLoader(ExtensionContext extensionContext) {
         Class<?> testClass = extensionContext.getRequiredTestClass();
         ClassLoader classLoader = testClass.getClassLoader();
         return classLoader.getClass().getName().equals(ModifiedClassPathClassLoader.class.getName());

@@ -238,13 +238,14 @@ public class ModifiedClassPathClassLoaderGenerator {
 
         // gradle project, jar cache path is like
         // ~/.gradle/caches/modules-2/files-2.1/com.google.code.gson/gson/2.8.6/3f7e1e9e8e1b0e1e8e1b0e1b0e1b0e1b0e1b0e1b/gson-2.8.6.jar
-        String gradlePartGroupId = groupIdArr[groupIdArr.length - 2] + "." + groupIdArr[groupIdArr.length - 1];
+        String gradlePartGroupId = groupIdArr[groupIdArr.length - 2] + "." + groupIdArr[groupIdArr.length - 1] + "/";
         if (urlStr.contains(gradlePartGroupId)) {
             return true;
         }
 
         // maven project, jar cache path is like ~/.m2/repository/com/google/code/gson/gson/2.8.6/gson-2.8.6.jar
-        String mavenPartGroupId = groupIdArr[groupIdArr.length - 2] + "/" + groupIdArr[groupIdArr.length - 1];
+        String mavenPartGroupId =
+                "/" + groupIdArr[groupIdArr.length - 2] + "/" + groupIdArr[groupIdArr.length - 1] + "/";
         if (urlStr.contains(mavenPartGroupId)) {
             return true;
         }
