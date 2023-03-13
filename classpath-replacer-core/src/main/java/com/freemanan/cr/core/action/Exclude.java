@@ -3,6 +3,7 @@ package com.freemanan.cr.core.action;
 import static com.freemanan.cr.core.util.Const.JAR_FILE_NAME_PATTERN;
 import static com.freemanan.cr.core.util.Const.MAVEN_COORDINATE_PATTERN;
 
+import com.freemanan.cr.core.util.Const;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -48,7 +49,8 @@ public class Exclude {
         List<String> patternList = new ArrayList<>();
         for (String pattern : patterns) {
             if (!pattern.matches(JAR_FILE_NAME_PATTERN) && !pattern.matches(MAVEN_COORDINATE_PATTERN)) {
-                throw new IllegalArgumentException("Invalid pattern: " + pattern);
+                throw new IllegalArgumentException(
+                        String.format(Const.EXCLUDE_ILLEGAL_PATTERN_MESSAGE_FORMAT, pattern));
             }
             patternList.add(pattern);
         }

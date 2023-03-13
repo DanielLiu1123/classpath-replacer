@@ -62,4 +62,9 @@ class ExcludeTest {
             Class.forName("org.springframework.cloud.bootstrap.marker.Marker");
         });
     }
+
+    @Test
+    void testIllegalPatterns() {
+        assertThrows(IllegalArgumentException.class, () -> Exclude.of("gson-*"));
+    }
 }

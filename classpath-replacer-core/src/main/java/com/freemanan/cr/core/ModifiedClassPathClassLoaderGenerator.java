@@ -195,7 +195,7 @@ public class ModifiedClassPathClassLoaderGenerator {
         }
 
         // illegal pattern
-        throw new IllegalArgumentException("Illegal pattern: " + pattern);
+        throw new IllegalArgumentException(String.format(Const.EXCLUDE_ILLEGAL_PATTERN_MESSAGE_FORMAT, pattern));
     }
 
     private static boolean isSameJar(URL url, URL mavenJarUrl) {
