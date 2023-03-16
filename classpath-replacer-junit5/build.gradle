@@ -6,9 +6,11 @@ dependencies {
     api("org.junit.jupiter:junit-jupiter")
     api("org.junit.platform:junit-platform-launcher")
 
-    testImplementation("ch.qos.logback:logback-classic:${logbackVersion}"){
+    testImplementation("ch.qos.logback:logback-classic:${logbackVersion}") {
         exclude(group: "org.slf4j", module: "slf4j-api")
     }
+    testImplementation("org.springframework.boot:spring-boot-starter-test:2.7.5")
+//    testImplementation("org.testcontainers:junit-jupiter:1.17.6")
 }
 
 apply from: "$rootDir/deploy.gradle"
