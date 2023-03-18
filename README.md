@@ -156,6 +156,36 @@ class JsonUtilTest {
 }
 ```
 
+## Limitation
+
+**The static field will not be reusable!**
+
+```java
+public class StaticMethodTests {
+
+  static AtomicInteger counter = new AtomicInteger(0);
+
+  @Test
+  @ClasspathReplacer({})
+  void test1() {
+    assertEquals(0, counter.getAndIncrement()); // pass
+  }
+
+  @Test
+  @ClasspathReplacer({})
+  void test2() {
+    assertEquals(0, counter.getAndIncrement()); // pass
+  }
+
+}
+```
+
+Because each test method has a different classpath, it causes the test class to be reloaded, and static field/blocks will also be reinitialized.
+
+If you want to use `@ClasspathReplacer` with `@SpringBootTest`, you need to consider the side effects that may come with restarting the Spring context.
+
+If you want to use `@ClasspathReplacer` with [testcontainers](https://www.testcontainers.org/), you need to consider the side effects that may come with restarting the container.
+
 ## Thanks
 
 This project is inspired
