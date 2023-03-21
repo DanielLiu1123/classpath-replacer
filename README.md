@@ -5,7 +5,7 @@
 [![Maven Central](https://img.shields.io/maven-central/v/com.freemanan/classpath-replacer-core)](https://search.maven.org/artifact/com.freemanan/classpath-replacer-core)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-This is a framework for replacing classpath.
+This library is used to replace the classpath in unit tests.
 
 When you need to write unit tests for different classpath scenarios, you will need it!
 
@@ -27,7 +27,7 @@ Then you need to test your library in different scenarios:
 But it is difficult to simulate this scenario in unit tests, because usually, unit tests are run under a fixed
 classpath.
 
-Classpath Replacer can help you simulate this scenario in your unit tests.
+`Classpath Replacer` can help you simulate this scenario in your unit tests.
 
 ## How to use
 
@@ -184,14 +184,14 @@ Because each test method has a different classpath, it causes the test class to 
 
 If you want to use `@ClasspathReplacer` with `@SpringBootTest`, you need to consider the side effects that may come with restarting the Spring context.
 
-If you want to use `@ClasspathReplacer` with [testcontainers](https://www.testcontainers.org/), you need to consider the side effects that may come with restarting the container.
+If you want to use `@ClasspathReplacer` with [Testcontainers](https://www.testcontainers.org/), you need to consider the side effects that may come with restarting the container.
 
 ## Thanks
 
 This project is inspired
 by [spring-boot-test-support](https://github.com/spring-projects/spring-boot/tree/main/spring-boot-project/spring-boot-tools/spring-boot-test-support).
 However, this library is only for internal use in Spring Boot and does not provide Maven coordinates for external use,
-so Classpath Replacer was born.
+so `Classpath Replacer` was born.
 
 ## License
 
