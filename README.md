@@ -190,7 +190,7 @@ If you want to use `@ClasspathReplacer` with [Testcontainers](https://www.testco
 
 This project is inspired
 by [spring-boot-test-support](https://github.com/spring-projects/spring-boot/tree/main/spring-boot-project/spring-boot-tools/spring-boot-test-support).
-However, this library is only for internal use in Spring Boot and does not provide Maven coordinates for external use,
+However, this library is only for internal use in `Spring Boot` and does not provide Maven coordinates for external use,
 so `Classpath Replacer` was born.
 
 ## License
