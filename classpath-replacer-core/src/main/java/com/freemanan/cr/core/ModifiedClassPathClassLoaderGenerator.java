@@ -21,7 +21,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
@@ -128,74 +127,86 @@ public class ModifiedClassPathClassLoaderGenerator {
             URL url,
             String pattern,
             Map<String, List<URL>> patternToJars) {
-        boolean recursiveExclude = Optional.ofNullable(classpathReplacer)
-                .map(ClasspathReplacer::recursiveExclude)
-                .orElse(false);
-        // like com.google.code.gson:gson:2.8.6
+        boolean recursiveExclude = classpathReplacer != null && classpathReplacer.recursiveExclude();
+
         if (pattern.matches(Const.MAVEN_COORDINATE_WITH_VERSION_PATTERN)) {
-            if (!recursiveExclude) {
-                String[] gav = pattern.split(":");
-                if (!isSameGroupIdWithExactMatch(url, gav[0].split("\\."))) {
-                    return false;
-                }
-                String artifactId = gav[1];
-                String version = gav[2];
-                String jarName = String.format("%s-%s.jar", artifactId, version);
-                return Objects.equals(jarName, fileName(url));
-            }
-            return patternToJars
-                    .computeIfAbsent(pattern, s -> resolveCoordinates(new String[] {pattern}, classpathReplacer))
-                    .stream()
-                    .anyMatch(jarPath -> isSameJar(url, jarPath));
+            return matchMavenCoordinateWithVersionPattern(recursiveExclude, url, pattern, patternToJars);
         }
 
-        // like com.google.code.gson:gson
         if (pattern.matches(Const.MAVEN_COORDINATE_PATTERN)) {
-            if (!recursiveExclude) {
-                String[] gav = pattern.split(":");
-
-                if (!isSameGroupIdWithExactMatch(url, gav[0].split("\\."))) {
-                    return false;
-                }
-
-                String artifactId = gav[1];
-
-                // like gson-2.8.6.jar
-                String fileName = fileName(url);
-                if (fileName == null || !fileName.startsWith(artifactId)) {
-                    return false;
-                }
-
-                // extract version
-                String version = fileName.substring(artifactId.length() + 1, fileName.length() - 4);
-                // it may be api-1.0.0
-                return version.matches(Const.VERSION_PATTERN);
-            }
-            return patternToVersionsSupplier.get().getOrDefault(pattern, Collections.emptyList()).stream()
-                    .anyMatch(version -> {
-                        String coordinate = pattern + ":" + version;
-                        return patternToJars
-                                .computeIfAbsent(
-                                        coordinate,
-                                        s -> resolveCoordinates(new String[] {coordinate}, classpathReplacer))
-                                .stream()
-                                .anyMatch(jarPath -> isSameJar(url, jarPath));
-                    });
+            return matchMavenCoordinatePattern(
+                    recursiveExclude, url, pattern, patternToJars, patternToVersionsSupplier);
         }
 
-        // like gson-*.jar
         if (pattern.contains("*")) {
-            String regex = pattern.replace(".", "\\.").replace("*", ".*");
-            return Pattern.matches(regex, fileName(url));
+            return matchWildcardPattern(pattern, url);
         }
 
-        // like gson-2.8.6.jar
         if (pattern.endsWith(".jar")) {
-            return pattern.equals(fileName(url));
+            return matchExactFileNamePattern(pattern, url);
         }
 
-        // illegal pattern
         throw new IllegalArgumentException(String.format(Const.EXCLUDE_ILLEGAL_PATTERN_MESSAGE_FORMAT, pattern));
+    }
+
+    private boolean matchMavenCoordinateWithVersionPattern(
+            boolean recursiveExclude, URL url, String pattern, Map<String, List<URL>> patternToJars) {
+        if (!recursiveExclude) {
+            String[] gav = pattern.split(":");
+            if (!isSameGroupIdWithExactMatch(url, gav[0].split("\\."))) {
+                return false;
+            }
+            String artifactId = gav[1];
+            String version = gav[2];
+            String jarName = String.format("%s-%s.jar", artifactId, version);
+            return Objects.equals(jarName, fileName(url));
+        }
+
+        return patternToJars
+                .computeIfAbsent(pattern, s -> resolveCoordinates(new String[] {pattern}, classpathReplacer))
+                .stream()
+                .anyMatch(jarPath -> isSameJar(url, jarPath));
+    }
+
+    private boolean matchMavenCoordinatePattern(
+            boolean recursiveExclude,
+            URL url,
+            String pattern,
+            Map<String, List<URL>> patternToJars,
+            Supplier<Map<String, List<String>>> patternToVersionsSupplier) {
+        if (!recursiveExclude) {
+            String[] gav = pattern.split(":");
+            if (!isSameGroupIdWithExactMatch(url, gav[0].split("\\."))) {
+                return false;
+            }
+            String artifactId = gav[1];
+            String fileName = fileName(url);
+            if (fileName == null || !fileName.startsWith(artifactId)) {
+                return false;
+            }
+            String version =
+                    fileName.substring(artifactId.length() + "-".length(), fileName.length() - ".jar".length());
+            return version.matches(Const.VERSION_PATTERN);
+        }
+
+        return patternToVersionsSupplier.get().getOrDefault(pattern, Collections.emptyList()).stream()
+                .anyMatch(version -> {
+                    String coordinate = pattern + ":" + version;
+                    return patternToJars
+                            .computeIfAbsent(
+                                    coordinate, s -> resolveCoordinates(new String[] {coordinate}, classpathReplacer))
+                            .stream()
+                            .anyMatch(jarPath -> isSameJar(url, jarPath));
+                });
+    }
+
+    private boolean matchWildcardPattern(String pattern, URL url) {
+        String regex = pattern.replace(".", "\\.").replace("*", ".*");
+        return Pattern.matches(regex, fileName(url));
+    }
+
+    private boolean matchExactFileNamePattern(String pattern, URL url) {
+        return pattern.equals(fileName(url));
     }
 
     private static boolean isSameJar(URL url, URL mavenJarUrl) {
@@ -287,18 +298,19 @@ public class ModifiedClassPathClassLoaderGenerator {
 
     private static List<String> findVersions(List<URL> urls, String groupAndArtifact) {
         List<String> versions = new ArrayList<>();
+        String[] ga = groupAndArtifact.split(":");
+        String artifactId = ga[1];
+        String regex = String.format("%s-(.*)\\.jar", artifactId);
+        Pattern pattern = Pattern.compile(regex);
         for (URL url : urls) {
             String fileName = fileName(url);
             if (fileName == null) {
                 continue;
             }
-            String[] ga = groupAndArtifact.split(":");
             if (!isSameGroupIdWithExactMatch(url, ga[0].split("\\."))) {
                 continue;
             }
-            String artifactId = ga[1];
-            String regex = String.format("%s-(.*)\\.jar", artifactId);
-            Matcher matcher = Pattern.compile(regex).matcher(fileName);
+            Matcher matcher = pattern.matcher(fileName);
             if (matcher.find()) {
                 String version = matcher.group(1);
                 if (version.matches(Const.VERSION_PATTERN)) {
