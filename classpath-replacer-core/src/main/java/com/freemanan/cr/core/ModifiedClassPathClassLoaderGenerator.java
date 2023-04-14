@@ -111,7 +111,7 @@ public class ModifiedClassPathClassLoaderGenerator {
         List<URL> copy = new ArrayList<>(result);
         for (String pattern : exclude.patterns()) {
             Supplier<Map<String, List<String>>> patternToVersionsSupplier = () -> {
-                patternToVersions.putIfAbsent(pattern, findVersions(copy, pattern));
+                patternToVersions.computeIfAbsent(pattern, k -> findVersions(copy, pattern));
                 return patternToVersions;
             };
             for (URL url : copy) {
