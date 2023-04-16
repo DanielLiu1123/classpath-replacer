@@ -29,6 +29,7 @@ import org.eclipse.aether.util.repository.AuthenticationBuilder;
  * @author Freeman
  */
 public final class MavenUtils {
+    private static final String mavenCenterUrl = "https://repo.maven.apache.org/maven2";
     private static final int MAX_RESOLUTION_ATTEMPTS = 3;
     private static final RepositorySystem repositorySystem;
     private static final DefaultRepositorySystemSession session;
@@ -121,7 +122,7 @@ public final class MavenUtils {
     }
 
     private static RemoteRepository centralRepository() {
-        return new RemoteRepository.Builder("central", "default", "https://repo.maven.apache.org/maven2").build();
+        return new RemoteRepository.Builder("central", "default", mavenCenterUrl).build();
     }
 
     private static List<Dependency> createDependencies(String[] coordinates) {
