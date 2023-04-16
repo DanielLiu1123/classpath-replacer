@@ -33,7 +33,7 @@ classpath.
 Gradle:
 
 ```groovy
-testImplementation 'com.freemanan:classpath-replacer-junit5:2.1.1'
+testImplementation 'com.freemanan:classpath-replacer-junit5:2.1.2'
 ```
 
 Maven:
@@ -43,7 +43,7 @@ Maven:
 <dependency>
     <groupId>com.freemanan</groupId>
     <artifactId>classpath-replacer-junit5</artifactId>
-    <version>2.1.1</version>
+    <version>2.1.2</version>
     <scope>test</scope>
 </dependency>
 ```
