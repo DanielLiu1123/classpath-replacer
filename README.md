@@ -4,9 +4,9 @@
 [![Maven Central](https://img.shields.io/maven-central/v/com.freemanan/classpath-replacer-core)](https://search.maven.org/artifact/com.freemanan/classpath-replacer-core)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-This library is used to replace the classpath in unit tests.
+`Classpath Replacer` is essential for writing unit tests that require different classpath. 
 
-When you need to write unit tests for different classpath scenarios, you will need it!
+If you need to test different classpath scenarios, this library is a must-have.
 
 ## When you need
 
@@ -30,16 +30,13 @@ classpath.
 
 ## How to use
 
-Gradle:
-
 ```groovy
+// Gradle
 testImplementation 'com.freemanan:classpath-replacer-junit5:2.1.2'
 ```
 
-Maven:
-
 ```xml
-
+<!-- Maven -->
 <dependency>
     <groupId>com.freemanan</groupId>
     <artifactId>classpath-replacer-junit5</artifactId>
