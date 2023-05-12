@@ -102,11 +102,78 @@ class SpringBootTest {
 
 `Exclude` action is used to exclude a dependency from the classpath.
 
+```java
+class SpringBootTest {
+    
+    @Test
+    @ClasspathReplacer({
+            @Action(verb = Action.EXCLUDE, value = "org.springframework.boot:spring-boot-starter:2.7.0"),
+    })
+    void testExclude() {
+        Assertions.assertThatCode(() -> Class.forName("org.springframework.boot.SpringBootVersion"))
+                .isInstanceOf(ClassNotFoundException.class);
+    }
+}
+```
+
+`Exclude` action only remove the current jar from the classpath and not remove the transitive dependencies!
+
+You can use `recursiveExclude` to remove the transitive dependencies.
+
+```java
+@ClasspathReplacer(
+        value = {
+            @Action(verb = Action.EXCLUDE, value = "org.springframework.boot:spring-boot-starter:2.7.0"),
+        },
+        recursiveExclude = true
+)
+```
+
+You can omit the version of the dependency, and it will remove all versions of the dependency.
+
+```java
+@ClasspathReplacer({
+        @Action(verb = Action.EXCLUDE, value = "org.springframework.boot:spring-boot-starter")
+})
+```
+
+> It will remove all versions of the dependency and transitive dependencies if `recursiveExclude` is `true`.
+
+You can also use jar file name pattern to exclude the dependency.
+
+```java
+@ClasspathReplacer({
+        @Action(verb = Action.EXCLUDE, value = "spring-boot-starter-*.jar")
+})
+```
+
+This will exclude all jar files that match the pattern.
+
+> `recursiveExclude` is not supported for jar file name pattern!
+
 ### Override
 
-**`Override` action has the same behavior as `Add` action!**
+**`Override` action has the same behavior as `Add` action!** Separating `ADD` and `OVERRIDE` for clearer semantic expression.
 
 ### Customized Repository
+
+Customized repository is supported.
+
+```java
+@ClasspathReplacer(
+        value = {
+            @Action(verb = ADD, value = "com.example:example:1.0-SNAPSHOT"),
+        },
+        repositories = {
+            @Repository(
+                    value = "https://maven.youcompany.com/maven/repository/xxx",
+                    username = "${MAVEN_USER}",
+                    password = "${MAVEN_PASSWORD}")
+        }
+)
+```
+
+You can use `${}` to reference environment variables or system properties, using environment variables first.
 
 ## Limitation
 
@@ -132,7 +199,7 @@ public class StaticMethodTests {
 }
 ```
 
-Because each test method has a different classpath, it causes the test class to be reloaded, and static field/blocks will also be reinitialized.
+Because each test method has a different classpath, it causes the test class to be reloaded, and static field/blocks will also be reinitialized for each test method invocation.
 
 If you want to use `@ClasspathReplacer` with `@SpringBootTest`, you need to consider the side effects that may come with restarting the Spring context.
 
