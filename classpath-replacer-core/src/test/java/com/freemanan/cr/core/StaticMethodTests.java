@@ -1,6 +1,6 @@
 package com.freemanan.cr.core;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.freemanan.cr.core.anno.ClasspathReplacer;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
  *
  * @author Freeman
  */
-public class StaticMethodTests {
+class StaticMethodTests {
 
     static AtomicInteger counter = new AtomicInteger(0);
 
