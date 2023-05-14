@@ -52,7 +52,7 @@ class JacksonTest {
     
     @Test
     @ClasspathReplacer({
-            @Action(verb = Action.ADD, value = "com.fasterxml.jackson.core:jackson-databind:2.14.2"),
+            @Action(verb = Action.ADD, value = "com.fasterxml.jackson.core:jackson-databind:2.14.2")
     })
     void jacksonOnClasspath() {
         Assertions.assertThatCode(() -> Class.forName("com.fasterxml.jackson.databind.ObjectMapper"))
@@ -65,7 +65,7 @@ class JacksonTest {
 
 ```java
 @ClasspathReplacer({
-        @Action(verb = Action.ADD, value = "org.springframework.boot:spring-boot-starter:2.6.0"),
+        @Action(verb = Action.ADD, value = "org.springframework.boot:spring-boot-starter:2.6.0")
 })
 class SpringBootTest {
     
@@ -88,7 +88,7 @@ class SpringBootTest {
     
     @Test
     @ClasspathReplacer({
-            @Action(verb = Action.ADD, value = "org.springframework.boot:spring-boot-starter:2.7.0"),
+            @Action(verb = Action.ADD, value = "org.springframework.boot:spring-boot-starter:2.7.0")
     })
     void testSpringBootVersion() {
         // If already exists Spring Boot 2.6.0 on classpath, it will be overridden by 2.7.0
