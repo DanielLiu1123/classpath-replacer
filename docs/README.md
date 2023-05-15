@@ -71,7 +71,7 @@ class SpringBootTest {
     
     @Test
     @ClasspathReplacer({
-            @Action(verb = Action.ADD, value = "org.springframework.boot:spring-boot-starter:2.7.0"),
+            @Action(verb = Action.ADD, value = "org.springframework.boot:spring-boot-starter:2.7.0")
     })
     void testSpringBootVersion() throws Exception {
         Class<?> clazz = Class.forName("org.springframework.boot.SpringBootVersion");
@@ -107,7 +107,7 @@ class SpringBootTest {
     
     @Test
     @ClasspathReplacer({
-            @Action(verb = Action.EXCLUDE, value = "org.springframework.boot:spring-boot-starter:2.7.0"),
+            @Action(verb = Action.EXCLUDE, value = "org.springframework.boot:spring-boot-starter:2.7.0")
     })
     void testExclude() {
         Assertions.assertThatCode(() -> Class.forName("org.springframework.boot.SpringBootVersion"))
@@ -123,7 +123,7 @@ You can use `recursiveExclude` to remove the transitive dependencies.
 ```java
 @ClasspathReplacer(
         value = {
-            @Action(verb = Action.EXCLUDE, value = "org.springframework.boot:spring-boot-starter:2.7.0"),
+            @Action(verb = Action.EXCLUDE, value = "org.springframework.boot:spring-boot-starter:2.7.0")
         },
         recursiveExclude = true
 )
