@@ -162,7 +162,7 @@ Customized repository is supported.
 ```java
 @ClasspathReplacer(
         value = {
-            @Action(verb = ADD, value = "com.example:example:1.0-SNAPSHOT"),
+            @Action(verb = ADD, value = "com.example:example:1.0-SNAPSHOT")
         },
         repositories = {
             @Repository(
