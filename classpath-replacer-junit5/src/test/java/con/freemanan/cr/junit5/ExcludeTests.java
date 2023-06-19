@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
     @Action(verb = OVERRIDE, value = "org.springframework.boot:spring-boot:3.0.0"),
     @Action(verb = EXCLUDE, value = "spring-boot-3.0.0.jar"),
 })
-public class ExcludeTests {
+class ExcludeTests {
 
     private static String getSpringBootVersion() throws Exception {
         Class<?> sbv = Class.forName("org.springframework.boot.SpringBootVersion");
@@ -25,13 +25,6 @@ public class ExcludeTests {
 
     @Test
     void testSpringBootHasBeenOverride() throws Exception {
-        String version = getSpringBootVersion();
-        assertNotEquals("3.0.0", version);
-        assertEquals("2.7.0", version);
-    }
-
-    @Test
-    void testSpringBootHasBeenOverride2() throws Exception {
         String version = getSpringBootVersion();
         assertNotEquals("3.0.0", version);
         assertEquals("2.7.0", version);
@@ -56,8 +49,6 @@ public class ExcludeTests {
         @Action(verb = EXCLUDE, value = "org.springframework.boot:spring-boot"),
     })
     void exclude_whenUsingCoordinateWithNoVersion() {
-        assertThrows(ClassNotFoundException.class, () -> {
-            getSpringBootVersion();
-        });
+        assertThrows(ClassNotFoundException.class, ExcludeTests::getSpringBootVersion);
     }
 }

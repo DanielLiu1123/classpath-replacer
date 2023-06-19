@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
     @Action(verb = OVERRIDE, value = "org.springframework.boot:spring-boot:2.7.1"),
     @Action(verb = EXCLUDE, value = "spring-boot-2.7.1.jar"),
 })
-public class ClasspathReplacerMethodLevelTests {
+class ClasspathReplacerMethodLevelTests {
 
     @Test
     void testVersionIs270_whenAdd270ThenOverrideWith300ThenExclude300() throws Exception {

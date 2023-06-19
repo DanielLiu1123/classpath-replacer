@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
     @Action(verb = ADD, value = "org.springframework.boot:spring-boot:2.7.0"),
     @Action(verb = OVERRIDE, value = "org.springframework.boot:spring-boot:2.7.1"),
 })
-public class OverrideTests {
+class OverrideTests {
 
     @Test
     void testSpringBootHasBeenOverride() throws Exception {

@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 @ClasspathReplacer({
     @Action(verb = ADD, value = "com.google.code.gson:gson:2.9.0"),
 })
-public class AddTests {
+class AddTests {
 
     @Test
     void testMarkExists() {

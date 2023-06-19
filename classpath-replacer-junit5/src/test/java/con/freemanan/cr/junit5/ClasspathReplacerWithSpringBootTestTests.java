@@ -31,7 +31,7 @@ import org.springframework.context.annotation.Import;
 @SpringBootTest(
         classes = ClasspathReplacerWithSpringBootTestTests.Cfg.class,
         webEnvironment = SpringBootTest.WebEnvironment.NONE)
-public class ClasspathReplacerWithSpringBootTestTests {
+class ClasspathReplacerWithSpringBootTestTests {
 
     @Autowired
     ConfigurableApplicationContext ctx;
