@@ -6,9 +6,9 @@
 
 `Classpath Replacer` is essential for writing unit tests that require different classpath. 
 
-If you need to test different classpath scenarios, this library is a must-have.
+If you need to test different classpath scenarios, this library is must-had.
 
-## When you need
+## When you need it
 
 If you are a library developer, then you may need to test the behavior of your library under different classpath.
 
