@@ -149,7 +149,7 @@ You can also use jar file name pattern to exclude the dependency.
 
 This will exclude all jar files that match the pattern.
 
-> `recursiveExclude` is not supported for jar file name pattern, because the transitive dependencies cannot be determined from the jar file name.
+> `recursiveExclude` is not supported for a jar file name pattern, because the transitive dependencies cannot be determined from the jar file name.
 
 ### Override
 
