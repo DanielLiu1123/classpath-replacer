@@ -139,7 +139,7 @@ You can omit the version of the dependency, and it will remove all versions of t
 
 > It will remove all versions of the dependency and transitive dependencies if `recursiveExclude` is `true`.
 
-You can also use jar file name pattern to exclude the dependency.
+You can also use a jar file name pattern to exclude the dependency.
 
 ```java
 @ClasspathReplacer({
