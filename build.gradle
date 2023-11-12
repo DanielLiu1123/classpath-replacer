@@ -3,7 +3,7 @@ plugins {
     id 'com.github.spotbugs' version "${spotbugsVersion}" apply false
 }
 
-subprojects {
+allprojects {
     apply plugin: 'java-library'
     repositories {
         mavenCentral()
@@ -34,7 +34,7 @@ subprojects {
                 if (it =~ /\nimport .*\*;/) {
                     throw new IllegalStateException("Do not use wildcard imports, 'spotlessApply' cannot resolve this issue, please fix it manually.")
                 }
-            })
+            } as Closure<String>)
         }
     }
     // spotbugs
