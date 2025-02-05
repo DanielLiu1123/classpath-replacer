@@ -1,4 +1,4 @@
-package cr.anno;
+package cr;
 
 /**
  * @author Freeman

@@ -1,10 +1,7 @@
 package cr;
 
-import static cr.anno.Verb.ADD;
+import static cr.Verb.ADD;
 
-import cr.anno.Action;
-import cr.anno.ClasspathReplacer;
-import cr.anno.Repository;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 

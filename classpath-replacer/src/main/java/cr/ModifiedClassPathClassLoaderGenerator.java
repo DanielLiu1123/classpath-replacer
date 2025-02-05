@@ -5,7 +5,6 @@ import static cr.util.MavenUtils.resolveCoordinates;
 import cr.action.Add;
 import cr.action.Exclude;
 import cr.action.Override;
-import cr.anno.ClasspathReplacer;
 import cr.util.Const;
 import java.io.File;
 import java.lang.management.ManagementFactory;

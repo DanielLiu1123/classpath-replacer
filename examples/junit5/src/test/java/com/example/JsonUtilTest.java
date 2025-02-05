@@ -1,12 +1,12 @@
 package com.example;
 
-import static cr.anno.Verb.ADD;
+import static cr.Verb.ADD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import cr.anno.Action;
-import cr.anno.ClasspathReplacer;
+import cr.Action;
+import cr.ClasspathReplacer;
 import org.junit.jupiter.api.Test;
 
 class JsonUtilTest {

@@ -1,4 +1,4 @@
-package cr.anno;
+package cr;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -1,13 +1,13 @@
 package cr.junit5;
 
-import static cr.anno.Verb.ADD;
-import static cr.anno.Verb.EXCLUDE;
+import static cr.Verb.ADD;
+import static cr.Verb.EXCLUDE;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-import cr.anno.Action;
-import cr.anno.ClasspathReplacer;
+import cr.Action;
+import cr.ClasspathReplacer;
 import org.junit.jupiter.api.Test;
 
 /**

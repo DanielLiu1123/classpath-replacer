@@ -1,4 +1,4 @@
-package cr.anno;
+package cr;
 
 import cr.framework.junit5.ClasspathReplacerExtension;
 import java.lang.annotation.ElementType;

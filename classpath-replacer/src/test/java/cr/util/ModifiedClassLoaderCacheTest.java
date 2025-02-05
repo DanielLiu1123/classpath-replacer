@@ -1,14 +1,14 @@
 package cr.util;
 
-import static cr.anno.Verb.ADD;
+import static cr.Verb.ADD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
-import cr.anno.Action;
-import cr.anno.ClasspathReplacer;
+import cr.Action;
+import cr.ClasspathReplacer;
 import java.util.HashSet;
 import java.util.Set;
 import org.junit.jupiter.api.Order;

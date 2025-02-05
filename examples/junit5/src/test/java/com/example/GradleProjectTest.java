@@ -1,11 +1,11 @@
 package com.example;
 
-import static cr.anno.Verb.EXCLUDE;
+import static cr.Verb.EXCLUDE;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import cr.anno.Action;
-import cr.anno.ClasspathReplacer;
+import cr.Action;
+import cr.ClasspathReplacer;
 import org.junit.jupiter.api.Test;
 
 /**

@@ -2,7 +2,6 @@ package cr;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import cr.anno.ClasspathReplacer;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 

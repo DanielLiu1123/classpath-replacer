@@ -1,7 +1,7 @@
 package cr.util;
 
-import cr.anno.ClasspathReplacer;
-import cr.anno.Repository;
+import cr.ClasspathReplacer;
+import cr.Repository;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;

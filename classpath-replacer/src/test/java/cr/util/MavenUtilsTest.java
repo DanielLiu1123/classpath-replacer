@@ -3,7 +3,7 @@ package cr.util;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import cr.anno.ClasspathReplacer;
+import cr.ClasspathReplacer;
 import java.net.URL;
 import java.util.List;
 import org.junit.jupiter.api.Test;
