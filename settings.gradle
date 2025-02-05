@@ -1,6 +1,5 @@
-rootProject.name = 'classpath-replacer'
+rootProject.name = 'classpath-replacer-root'
 
-include(":classpath-replacer-core")
-include(":classpath-replacer-junit5")
+include(":classpath-replacer")
 
 include(":examples:junit5")
