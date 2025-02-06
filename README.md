@@ -23,7 +23,7 @@ Then you need to test your library in different scenarios:
 - With both `Jackson` and `Gson`
 - Different versions of behaviors (e.g. `Gson` 2.8.9 and 2.9.0)
 
-But it is difficult to simulate this scenario in unit tests, because usually, unit tests are run under a fixed
+But it is challenging to simulate this scenario in unit tests, because usually, unit tests are run under a fixed
 classpath.
 
 `Classpath Replacer` can help you simulate this scenario in your unit tests.
@@ -32,131 +32,77 @@ classpath.
 
 ```groovy
 // Gradle
-testImplementation 'com.freemanan:classpath-replacer-junit5:2.1.2'
+testImplementation "io.github.danielliu1123:classpath-replacer:<latest>"
 ```
 
 ```xml
 <!-- Maven -->
 <dependency>
-    <groupId>com.freemanan</groupId>
-    <artifactId>classpath-replacer-junit5</artifactId>
-    <version>2.1.2</version>
+    <groupId>io.github.danielliu1123</groupId>
+    <artifactId>classpath-replacer</artifactId>
+    <version>latest</version>
     <scope>test</scope>
 </dependency>
 ```
 
-NOTE: from version `2.0.0`, `classpath-replacer` supports JDK 8, the previous versions only support JDK 17.
+`@Classpath` is the core annotation of this framework. It can be used on the test class or test method, method-level annotation will override the class-level annotation.
 
-`@ClasspathReplacer` is the core annotation of this framework. It can be used on the test class or test method.
-
-You can define your classpath replacement rules in `@ClasspathReplacer`, which consists of `@Action`, each `@Action`
-represents a classpath replacement rule.
-
-`@Action` has three verbs:
-
-- `ADD`：
-
-  Add dependencies, add dependencies if not exist, otherwise replace the existing dependency with the specified
-  version.
-
-  ```java
-  // add spring-boot:3.0.0 and its transitive dependencies to the classpath.
-  @ClasspathReplacer(@Action(verb = ADD, value = "org.springframework.boot:spring-boot:3.0.0"))
-  ```
-
-- `EXCLUDE`：
-
-  Exclude dependencies, value supports jar package name and maven coordinate.
-
-  ```java
-  // Exclude spring-boot-3.0.0.jar from the classpath, but not include its transitive dependencies.
-  @ClasspathReplacer(@Action(verb = EXCLUDE, value = "spring-boot-3.0.0.jar"))
-  
-  // Same as above.
-  @ClasspathReplacer(@Action(verb = EXCLUDE, value = "org.springframework.boot:spring-boot:3.0.0"))
-  
-  // Exclude all versions of spring-boot jars in the classpath. Using jar package name can't exclude transitive dependencies.
-  @ClasspathReplacer(@Action(verb = EXCLUDE, value = "spring-boot-*.jar"))
-  
-  // If you want to exclude all versions of spring-boot jars, just omit the version
-  @ClasspathReplacer(@Action(verb = EXCLUDE, value = "org.springframework.boot:spring-boot"))
-  
-  // Using maven coordinate doesn't exclude the transitive dependencies by default, you can set `recursiveExclude` to true to enable this feature.
-  @ClasspathReplacer(recursiveExclude = true, value = {@Action(verb = EXCLUDE, value = "org.springframework.boot:spring-boot:3.0.0")})
-  
-  // exclude all versions of spring-boot jars and their transitive dependencies
-  @ClasspathReplacer(recursiveExclude = true, value = {@Action(verb = EXCLUDE, value = "org.springframework.boot:spring-boot")})
-  ```
-
-- `OVERRIDE`：
-
-  **`Override` has the same behavior as `ADD`**, separate `ADD` and `OVERRIDE` just for clearer semantic expression.
-
-All the `@Action` are executed in the order of definition, for example:
+Examples:
 
 ```java
+// add spring-boot:3.0.0 and its transitive dependencies to the classpath.
+@Classpath(add = "org.springframework.boot:spring-boot:3.0.0")
 
-@ClasspathReplacer({
-        @Action(verb = ADD, value = "com.google.code.gson:gson:2.8.9"),
-        @Action(verb = EXCLUDE, value = "com.google.code.gson:gson:2.8.9"),
-        @Action(verb = ADD, value = "com.google.code.gson:gson:2.9.0")
-})
-class SomeTest {
-}
+// Exclude spring-boot-3.0.0.jar from the classpath, but not include its transitive dependencies.
+// value uses the jar package name.
+@Classpath(exclude = "spring-boot-3.0.0.jar")
+
+// Exclude spring-boot-3.0.0.jar from the classpath, but not include its transitive dependencies.
+// value uses the maven coordinate.
+@Classpath(exclude = "org.springframework.boot:spring-boot:3.0.0")
+
+// Exclude all versions of spring-boot jars in the classpath. 
+// Using jar package name can't exclude transitive dependencies.
+@Classpath(exclude = "spring-boot-*.jar")
+
+// If you want to exclude all versions of spring-boot jars, just omit the version
+@Classpath(exclude = "org.springframework.boot:spring-boot")
+
+// Using maven coordinate doesn't exclude the transitive dependencies by default, you can set `excludeTransitive` to true.
+@Classpath(exclude = "org.springframework.boot:spring-boot:3.0.0", excludeTransitive = true)
+
+// exclude all versions of spring-boot jars and their transitive dependencies
+@Classpath(exclude = "org.springframework.boot:spring-boot", excludeTransitive = true)
 ```
-
-The above `@ClasspathReplacer` will add `gson:2.8.9` first, and exclude `gson:2.8.9`, then add `gson:2.9.0`. The final
-classpath will be `gson:2.9.0`.
-
-Proxy repositories and private repositories can be configured in `@ClasspathReplacer`, such as:
-
-```java
-
-@ClasspathReplacer(
-        repositories = {
-                @Repository("https://maven.aliyun.com/repository/public/"),
-                @Repository(value = "https://maven.youcompany.com/repository/release/", username = "admin", password = "${MAVEN_PASSWORD}")
-        },
-        value = {
-                @Action(verb = ADD, value = "com.yourcompany:your-library:1.0.0")
-        })
-class SomeTest {
-}
-```
-
-`username` and `password` support `${}` variable replacement, it will be parsed from system env or system properties, system env has higher priority.
 
 For the test scenarios of the above `JsonUtil`, you can write the following tests:
 
 ```java
 class JsonUtilTest {
 
-    @Test
-    void testNoJsonImplementationOnClasspath() {
-        assertThrows(ExceptionInInitializerError.class, JsonUtil::instance);
-    }
+  @Test
+  void testNoJsonImplementationOnClasspath() {
+    assertThrows(ExceptionInInitializerError.class, JsonUtil::instance);
+  }
 
-    @Test
-    @ClasspathReplacer(@Action(verb = ADD, value = "com.google.code.gson:gson:2.10.1"))
-    void testGsonOnClasspath() {
-        assertTrue(JsonUtil.instance() instanceof Gson);
-        assertEquals("{}", JsonUtil.toJson(new Object()));
-    }
+  @Test
+  @Classpath(add = "com.google.code.gson:gson:2.10.1")
+  void testGsonOnClasspath() {
+    assertTrue(JsonUtil.instance() instanceof Gson);
+    assertEquals("{}", JsonUtil.toJson(new Object()));
+  }
 
-    @Test
-    @ClasspathReplacer(@Action(verb = ADD, value = "com.fasterxml.jackson.core:jackson-databind:2.14.1"))
-    void testJacksonOnClasspath() {
-        assertTrue(JsonUtil.instance() instanceof Jackson);
-    }
+  @Test
+  @Classpath(add = "com.fasterxml.jackson.core:jackson-databind:2.14.1")
+  void testJacksonOnClasspath() {
+    assertTrue(JsonUtil.instance() instanceof Jackson);
+  }
 
-    @Test
-    @ClasspathReplacer({
-            @Action(verb = ADD, value = "com.fasterxml.jackson.core:jackson-databind:2.14.1"),
-            @Action(verb = ADD, value = "com.google.code.gson:gson:2.10.1")
-    })
-    void useJacksonFirst_whenBothJacksonAndGsonOnClasspath() {
-        assertTrue(JsonUtil.instance() instanceof Jackson);
-    }
+  @Test
+  @Classpath(add = {"com.fasterxml.jackson.core:jackson-databind:2.14.1", "com.google.code.gson:gson:2.10.1"})
+  void useJacksonFirst_whenBothJacksonAndGsonOnClasspath() {
+    assertTrue(JsonUtil.instance() instanceof Jackson);
+  }
 }
 ```
 
@@ -170,13 +116,13 @@ public class StaticMethodTests {
   static AtomicInteger counter = new AtomicInteger(0);
 
   @Test
-  @ClasspathReplacer({})
+  @Classpath
   void test1() {
     assertEquals(0, counter.getAndIncrement()); // pass
   }
 
   @Test
-  @ClasspathReplacer({})
+  @Classpath
   void test2() {
     assertEquals(0, counter.getAndIncrement()); // pass
   }
@@ -186,9 +132,9 @@ public class StaticMethodTests {
 
 Because each test method has a different classpath, it causes the test class to be reloaded, and static field/blocks will also be reinitialized.
 
-If you want to use `@ClasspathReplacer` with `@SpringBootTest`, you need to consider the side effects that may come with restarting the Spring context.
+If you want to use `@Classpath` with `@SpringBootTest`, you need to consider the side effects that may come with restarting the Spring context.
 
-If you want to use `@ClasspathReplacer` with [Testcontainers](https://www.testcontainers.org/), you need to consider the side effects that may come with restarting the container.
+If you want to use `@Classpath` with [Testcontainers](https://www.testcontainers.org/), you need to consider the side effects that may come with restarting the container.
 
 ## Thanks
 

@@ -46,8 +46,8 @@ publishing {
                     }
                 }
                 scm {
-                    connection = "scm:git:git://${githubUrl.substring(schemaLength)}.git"
-                    developerConnection = "scm:git:ssh@${githubUrl.substring(schemaLength)}.git"
+                    connection = "scm:git:git://${githubUrl.substring(8)}.git"
+                    developerConnection = "scm:git:ssh@${githubUrl.substring(8)}.git"
                     url = "${githubUrl}"
                 }
             }
@@ -59,10 +59,10 @@ publishing {
                 username System.getenv('OSSRH_USER')
                 password System.getenv('OSSRH_PASSWORD')
             }
-            if (version.endsWith('-SNAPSHOT')) {
-                url 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
-            } else {
+            if (isRelease) {
                 url 'https://s01.oss.sonatype.org/content/repositories/releases/'
+            } else {
+                url 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
             }
         }
     }
