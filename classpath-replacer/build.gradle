@@ -1,5 +1,4 @@
 dependencies {
-//    api(platform("org.junit:junit-bom:${junit5Version}"))
     api(platform("org.jboss.shrinkwrap.resolver:shrinkwrap-resolver-bom:${shrinkwrapResolversVersion}"))
 
     api("org.jboss.shrinkwrap.resolver:shrinkwrap-resolver-impl-maven-archive")

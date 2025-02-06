@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * @author Freeman
  */
-public class Exclude {
+public final class Exclude {
 
     /**
      * File name patterns.

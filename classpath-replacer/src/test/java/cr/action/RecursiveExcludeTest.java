@@ -1,12 +1,9 @@
 package cr.action;
 
-import static cr.Verb.ADD;
-import static cr.Verb.EXCLUDE;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import cr.Action;
-import cr.ClasspathReplacer;
+import cr.Classpath;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -15,12 +12,10 @@ import org.junit.jupiter.api.Test;
 class RecursiveExcludeTest {
 
     @Test
-    @ClasspathReplacer(
-            value = {
-                @Action(verb = ADD, value = "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.5"),
-                @Action(verb = EXCLUDE, value = "spring-cloud-starter-bootstrap-*.jar"),
-            },
-            recursiveExclude = true)
+    @Classpath(
+            add = "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.5",
+            exclude = "spring-cloud-starter-bootstrap-*.jar",
+            excludeTransitive = true)
     void notExcludeSubDependencies_whenUsingJarFileName() {
         assertThrows(ClassNotFoundException.class, () -> {
             Class.forName("org.springframework.cloud.bootstrap.marker.Marker");
@@ -31,44 +26,38 @@ class RecursiveExcludeTest {
     }
 
     @Test
-    @ClasspathReplacer(
-            value = {
-                @Action(verb = ADD, value = "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.5"),
-                @Action(verb = EXCLUDE, value = "org.springframework.cloud:spring-cloud-starter-bootstrap"),
-            },
-            recursiveExclude = true)
+    @Classpath(
+            add = "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.5",
+            exclude = "org.springframework.cloud:spring-cloud-starter-bootstrap",
+            excludeTransitive = true)
     void excludeSubDependencies_whenUsingMavenCoordinateWithoutVersion() {
         assertThrows(ClassNotFoundException.class, () -> {
             Class.forName("org.springframework.cloud.bootstrap.marker.Marker");
         });
-        assertThrows(ClassNotFoundException.class, () -> {
+        assertThrows(NoClassDefFoundError.class, () -> {
             Class.forName("org.springframework.boot.SpringApplication");
         });
     }
 
     @Test
-    @ClasspathReplacer(
-            value = {
-                @Action(verb = ADD, value = "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.5"),
-                @Action(verb = EXCLUDE, value = "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.5"),
-            },
-            recursiveExclude = true)
+    @Classpath(
+            add = "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.5",
+            exclude = "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.5",
+            excludeTransitive = true)
     void excludeSubDependencies_whenUsingMavenCoordinate() {
         assertThrows(ClassNotFoundException.class, () -> {
             Class.forName("org.springframework.cloud.bootstrap.marker.Marker");
         });
-        assertThrows(ClassNotFoundException.class, () -> {
+        assertThrows(NoClassDefFoundError.class, () -> {
             Class.forName("org.springframework.boot.SpringApplication");
         });
     }
 
     @Test
-    @ClasspathReplacer(
-            value = {
-                @Action(verb = ADD, value = "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.5"),
-                @Action(verb = EXCLUDE, value = "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.5"),
-            },
-            recursiveExclude = false)
+    @Classpath(
+            add = "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.5",
+            exclude = "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.5",
+            excludeTransitive = false)
     void notExcludeSubDependencies_whenRecursiveExcludeDisabled() {
         assertThrows(ClassNotFoundException.class, () -> {
             Class.forName("org.springframework.cloud.bootstrap.marker.Marker");
@@ -79,13 +68,13 @@ class RecursiveExcludeTest {
     }
 
     @Test
-    @ClasspathReplacer(
-            value = {
-                @Action(verb = ADD, value = "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.6"),
-                @Action(verb = ADD, value = "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.5"),
-                @Action(verb = EXCLUDE, value = "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.5"),
+    @Classpath(
+            add = {
+                "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.6",
+                "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.5"
             },
-            recursiveExclude = true)
+            exclude = "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.5",
+            excludeTransitive = true)
     void excludeSubDependencies_whenHasDifferentVersion_thenOnlyCurrentVersionIsExcluded() {
         assertDoesNotThrow(() -> {
             Class.forName("org.springframework.cloud.bootstrap.marker.Marker");
@@ -96,18 +85,18 @@ class RecursiveExcludeTest {
     }
 
     @Test
-    @ClasspathReplacer(
-            value = {
-                @Action(verb = ADD, value = "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.6"),
-                @Action(verb = ADD, value = "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.5"),
-                @Action(verb = EXCLUDE, value = "org.springframework.cloud:spring-cloud-starter-bootstrap"),
+    @Classpath(
+            add = {
+                "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.6",
+                "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.5"
             },
-            recursiveExclude = true)
+            exclude = "org.springframework.cloud:spring-cloud-starter-bootstrap",
+            excludeTransitive = true)
     void excludeSubDependencies_whenRecursiveExcludeWithoutVersion() {
         assertThrows(ClassNotFoundException.class, () -> {
             Class.forName("org.springframework.cloud.bootstrap.marker.Marker");
         });
-        assertThrows(ClassNotFoundException.class, () -> {
+        assertThrows(NoClassDefFoundError.class, () -> {
             Class.forName("org.springframework.boot.SpringApplication");
         });
         // If dependencies with different versions have same version dependency, still works perfectly ^_*
@@ -117,13 +106,13 @@ class RecursiveExcludeTest {
     }
 
     @Test
-    @ClasspathReplacer(
-            value = {
-                @Action(verb = ADD, value = "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.6"),
-                @Action(verb = ADD, value = "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.5"),
-                @Action(verb = EXCLUDE, value = "org.springframework.cloud:spring-cloud-starter-bootstrap"),
+    @Classpath(
+            add = {
+                "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.6",
+                "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.5"
             },
-            recursiveExclude = false)
+            exclude = "org.springframework.cloud:spring-cloud-starter-bootstrap",
+            excludeTransitive = false)
     void excludeAllVersionOfThisDependency_whenHaveSameDependencyWithDifferentVersionAndRecursiveExcludeDisabled() {
         assertThrows(ClassNotFoundException.class, () -> {
             Class.forName("org.springframework.cloud.bootstrap.marker.Marker");

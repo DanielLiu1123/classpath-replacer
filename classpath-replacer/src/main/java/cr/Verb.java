@@ -2,7 +2,9 @@ package cr;
 
 /**
  * @author Freeman
+ * @deprecated by Freeman since 3.0.0, use {@link Classpath} instead.
  */
+@Deprecated
 public enum Verb {
     /**
      * Add jar in the classpath.

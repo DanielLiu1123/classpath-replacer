@@ -1,11 +1,9 @@
 package cr;
 
-import static cr.util.MavenUtils.resolveCoordinates;
-
 import cr.action.Add;
 import cr.action.Exclude;
-import cr.action.Override;
 import cr.util.Const;
+import cr.util.MavenUtils;
 import java.io.File;
 import java.lang.management.ManagementFactory;
 import java.net.URISyntaxException;
@@ -14,7 +12,6 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -30,77 +27,58 @@ import java.util.stream.Stream;
 
 /**
  * @author Freeman
- * @deprecated by Freeman since 3.0.0, use {@link ModifiedClassPathClassLoaderBuilder} instead.
  */
-@Deprecated
-public class ModifiedClassPathClassLoaderGenerator {
+public class ModifiedClassPathClassLoaderBuilder {
     private static final Pattern INTELLIJ_CLASSPATH_JAR_PATTERN = Pattern.compile(".*classpath(\\d+)?\\.jar");
 
-    private final List<Object> actions = new LinkedList<>();
+    private final List<Add> adds = new LinkedList<>();
+    private final List<Exclude> excludes = new LinkedList<>();
     private final ClassLoader parent;
 
     /**
-     * Nullable, because {@link ModifiedClassPathClassLoaderGenerator} may be used to programmatically generate classloader.
+     * Nullable, because {@link ModifiedClassPathClassLoaderBuilder} may be used to programmatically generate classloader.
      */
-    private ClasspathReplacer classpathReplacer;
+    private Classpath classpath;
 
-    private ModifiedClassPathClassLoaderGenerator(ClassLoader parent) {
+    ModifiedClassPathClassLoaderBuilder(ClassLoader parent) {
         this.parent = parent;
     }
 
-    public static ModifiedClassPathClassLoaderGenerator of(ClassLoader parent) {
-        return new ModifiedClassPathClassLoaderGenerator(parent);
-    }
-
-    public ModifiedClassPathClassLoaderGenerator exclude(String... patterns) {
-        actions.add(Exclude.of(patterns));
+    public ModifiedClassPathClassLoaderBuilder exclude(String... patterns) {
+        excludes.add(Exclude.of(patterns));
         return this;
     }
 
-    public ModifiedClassPathClassLoaderGenerator add(String... coordinates) {
-        actions.add(Add.of(coordinates));
+    public ModifiedClassPathClassLoaderBuilder add(String... coordinates) {
+        adds.add(Add.of(coordinates));
         return this;
     }
 
-    public ModifiedClassPathClassLoaderGenerator override(String... coordinates) {
-        actions.add(Override.of(coordinates));
+    public ModifiedClassPathClassLoaderBuilder classpathReplacer(Classpath classpath) {
+        this.classpath = classpath;
         return this;
     }
 
-    public ModifiedClassPathClassLoaderGenerator classpathReplacer(ClasspathReplacer classpathReplacer) {
-        this.classpathReplacer = classpathReplacer;
-        return this;
-    }
-
-    public ModifiedClassPathClassLoader gen() {
+    public ModifiedClassPathClassLoader build() {
         URL[] urls = extractUrls(parent);
         List<URL> result = Arrays.stream(urls)
                 .collect(Collectors.toCollection(
                         LinkedList::new)); // we may have some exclude actions, LinkedList is better
-        actions.forEach(action -> {
-            if (action instanceof Exclude) {
-                exclude(result, (Exclude) action);
-            } else if (action instanceof Add) {
-                add(result, (Add) action);
-            } else if (action instanceof Override) {
-                override(result, (Override) action);
-            } else {
-                throw new IllegalArgumentException("Unknown action: " + action);
-            }
-        });
+        // add first, then exclude
+        for (Add add : adds) {
+            add(result, add);
+        }
+        for (Exclude exclude : excludes) {
+            exclude(result, exclude);
+        }
         return new ModifiedClassPathClassLoader(result.toArray(new URL[0]), parent.getParent(), parent);
     }
 
-    private void override(List<URL> result, Override override) {
-        // have same behavior as add
-        add(result, Add.of(override.coordinates().toArray(new String[0])));
-    }
-
     private void add(List<URL> result, Add add) {
-        List<String> coordinates =
-                add.coordinates().stream().sorted(Comparator.reverseOrder()).collect(Collectors.toList());
         // Add to the beginning of the list to make sure the added jars are loaded first.
-        result.addAll(0, getAdditionalUrls(coordinates));
+        for (String coordinate : add.coordinates()) {
+            result.addAll(0, MavenUtils.resolveCoordinate(coordinate));
+        }
     }
 
     private void exclude(List<URL> result, Exclude exclude) {
@@ -128,15 +106,15 @@ public class ModifiedClassPathClassLoaderGenerator {
             URL url,
             String pattern,
             Map<String, List<URL>> patternToJars) {
-        boolean recursiveExclude = classpathReplacer != null && classpathReplacer.recursiveExclude();
+        boolean excludeTransitive = classpath != null && classpath.excludeTransitive();
 
         if (pattern.matches(Const.MAVEN_COORDINATE_WITH_VERSION_PATTERN)) {
-            return matchMavenCoordinateWithVersionPattern(recursiveExclude, url, pattern, patternToJars);
+            return matchMavenCoordinateWithVersionPattern(excludeTransitive, url, pattern, patternToJars);
         }
 
         if (pattern.matches(Const.MAVEN_COORDINATE_PATTERN)) {
             return matchMavenCoordinatePattern(
-                    recursiveExclude, url, pattern, patternToJars, patternToVersionsSupplier);
+                    excludeTransitive, url, pattern, patternToJars, patternToVersionsSupplier);
         }
 
         if (pattern.contains("*")) {
@@ -163,9 +141,7 @@ public class ModifiedClassPathClassLoaderGenerator {
             return Objects.equals(jarName, fileName(url));
         }
 
-        return patternToJars
-                .computeIfAbsent(pattern, s -> resolveCoordinates(new String[] {pattern}, classpathReplacer))
-                .stream()
+        return patternToJars.computeIfAbsent(pattern, s -> MavenUtils.resolveCoordinate(pattern)).stream()
                 .anyMatch(jarPath -> isSameJar(url, jarPath));
     }
 
@@ -194,8 +170,7 @@ public class ModifiedClassPathClassLoaderGenerator {
                 .anyMatch(version -> {
                     String coordinate = pattern + ":" + version;
                     return patternToJars
-                            .computeIfAbsent(
-                                    coordinate, s -> resolveCoordinates(new String[] {coordinate}, classpathReplacer))
+                            .computeIfAbsent(coordinate, s -> MavenUtils.resolveCoordinate(coordinate))
                             .stream()
                             .anyMatch(jarPath -> isSameJar(url, jarPath));
                 });
@@ -350,7 +325,7 @@ public class ModifiedClassPathClassLoaderGenerator {
             return Stream.of(((URLClassLoader) classLoader).getURLs());
         }
         return Stream.of(ManagementFactory.getRuntimeMXBean().getClassPath().split(File.pathSeparator))
-                .map(ModifiedClassPathClassLoaderGenerator::toURL);
+                .map(ModifiedClassPathClassLoaderBuilder::toURL);
     }
 
     private static URL toURL(String entry) {
@@ -401,12 +376,5 @@ public class ModifiedClassPathClassLoaderGenerator {
         try (JarFile jarFile = new JarFile(new File(url.toURI()))) {
             return jarFile.getManifest().getMainAttributes();
         }
-    }
-
-    private List<URL> getAdditionalUrls(List<String> coordinates) {
-        if (coordinates.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return resolveCoordinates(coordinates.toArray(new String[0]), classpathReplacer);
     }
 }

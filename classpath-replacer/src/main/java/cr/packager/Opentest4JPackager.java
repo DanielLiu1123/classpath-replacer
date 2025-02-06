@@ -1,4 +1,4 @@
-package cr.framework.packager;
+package cr.packager;
 
 /**
  * @author Freeman

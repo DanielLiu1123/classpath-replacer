@@ -1,25 +1,22 @@
 package cr.junit5;
 
-import static cr.Verb.ADD;
-import static cr.Verb.EXCLUDE;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-import cr.Action;
-import cr.ClasspathReplacer;
+import cr.Classpath;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Freeman
  */
-@ClasspathReplacer(
-        value = {
-            @Action(verb = ADD, value = "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.5"),
-            @Action(verb = ADD, value = "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.6"),
-            @Action(verb = EXCLUDE, value = "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.6"),
+@Classpath(
+        add = {
+            "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.5",
+            "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.6"
         },
-        recursiveExclude = true)
+        exclude = "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.6",
+        excludeTransitive = true)
 class Junit5Test {
 
     @Test

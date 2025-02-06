@@ -15,13 +15,13 @@ class StaticMethodTests {
     static AtomicInteger counter = new AtomicInteger(0);
 
     @Test
-    @ClasspathReplacer({})
+    @Classpath
     void test1() {
         assertEquals(0, counter.getAndIncrement());
     }
 
     @Test
-    @ClasspathReplacer({})
+    @Classpath
     void test12() {
         assertEquals(0, counter.getAndIncrement());
     }

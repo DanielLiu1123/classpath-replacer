@@ -9,9 +9,11 @@ import java.lang.annotation.Target;
  * Repository annotation.
  *
  * @author Freeman
+ * @deprecated by Freeman since 3.0.0, custom repository is not supported anymore.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
+@Deprecated
 public @interface Repository {
 
     /**

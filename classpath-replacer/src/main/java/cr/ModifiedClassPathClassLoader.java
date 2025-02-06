@@ -1,6 +1,6 @@
 package cr;
 
-import cr.framework.packager.PackagerHolder;
+import cr.packager.PackagerHolder;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.List;
@@ -21,6 +21,10 @@ public class ModifiedClassPathClassLoader extends URLClassLoader {
         this.internalPackages = PackagerHolder.getPackagers().stream()
                 .flatMap(packager -> Stream.of(packager.internalPackages()))
                 .collect(Collectors.toList());
+    }
+
+    public static ModifiedClassPathClassLoaderBuilder builder(ClassLoader parent) {
+        return new ModifiedClassPathClassLoaderBuilder(parent);
     }
 
     @Override

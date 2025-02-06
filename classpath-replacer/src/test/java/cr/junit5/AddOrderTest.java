@@ -1,10 +1,8 @@
 package cr.junit5;
 
-import static cr.Verb.ADD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import cr.Action;
-import cr.ClasspathReplacer;
+import cr.Classpath;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -13,19 +11,13 @@ import org.junit.jupiter.api.Test;
 class AddOrderTest {
 
     @Test
-    @ClasspathReplacer({
-        @Action(verb = ADD, value = "org.springframework.boot:spring-boot:2.7.0"),
-        @Action(verb = ADD, value = "org.springframework.boot:spring-boot:2.7.1"),
-    })
+    @Classpath(add = {"org.springframework.boot:spring-boot:2.7.0", "org.springframework.boot:spring-boot:2.7.1"})
     void versionShouldBe3_0_1_whenAdd3_0_0_thenAdd3_0_1() {
         assertEquals("2.7.1", springBootVersion());
     }
 
     @Test
-    @ClasspathReplacer({
-        @Action(verb = ADD, value = "org.springframework.boot:spring-boot:2.7.1"),
-        @Action(verb = ADD, value = "org.springframework.boot:spring-boot:2.7.0"),
-    })
+    @Classpath(add = {"org.springframework.boot:spring-boot:2.7.1", "org.springframework.boot:spring-boot:2.7.0"})
     void versionShouldBe3_0_0_whenAdd3_0_1_thenAdd3_0_0() {
         assertEquals("2.7.0", springBootVersion());
     }

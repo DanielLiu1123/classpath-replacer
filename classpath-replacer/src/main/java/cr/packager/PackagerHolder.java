@@ -1,4 +1,4 @@
-package cr.framework.packager;
+package cr.packager;
 
 import java.util.ArrayList;
 import java.util.Collections;

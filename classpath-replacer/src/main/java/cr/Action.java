@@ -9,9 +9,11 @@ import java.lang.annotation.Target;
  * One action to the classpath.
  *
  * @author Freeman
+ * @deprecated by Freeman since 3.0.0, use {@link Classpath} instead.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
+@Deprecated
 public @interface Action {
 
     /**

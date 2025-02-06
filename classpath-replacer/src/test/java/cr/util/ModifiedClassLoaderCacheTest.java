@@ -1,14 +1,12 @@
 package cr.util;
 
-import static cr.Verb.ADD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
-import cr.Action;
-import cr.ClasspathReplacer;
+import cr.Classpath;
 import java.util.HashSet;
 import java.util.Set;
 import org.junit.jupiter.api.Order;
@@ -19,9 +17,7 @@ import org.junit.jupiter.api.Test;
  *
  * @author Freeman
  */
-@ClasspathReplacer({
-    @Action(verb = ADD, value = "com.google.code.gson:gson:2.9.0"),
-})
+@Classpath(add = "com.google.code.gson:gson:2.8.9")
 class ModifiedClassLoaderCacheTest {
 
     private static final Set<ClassLoader> classLoaders = new HashSet<>();
@@ -55,9 +51,7 @@ class ModifiedClassLoaderCacheTest {
 
     @Test
     @Order(3)
-    @ClasspathReplacer({
-        @Action(verb = ADD, value = "com.google.code.gson:gson:2.9.0"),
-    })
+    @Classpath(add = "com.google.code.gson:gson:2.9.0")
     void test3() {
         // different class loader
         assertNull(ModifiedClassLoaderCache.get(ModifiedClassLoaderCacheTest.class));
@@ -73,9 +67,7 @@ class ModifiedClassLoaderCacheTest {
 
     @Test
     @Order(4)
-    @ClasspathReplacer({
-        @Action(verb = ADD, value = "com.google.code.gson:gson:2.9.0"),
-    })
+    @Classpath(add = "com.google.code.gson:gson:2.9.0")
     void test4() {
         // different class loader
         assertNull(ModifiedClassLoaderCache.get(ModifiedClassLoaderCacheTest.class));

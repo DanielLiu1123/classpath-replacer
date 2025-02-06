@@ -1,4 +1,4 @@
-package cr.framework.junit5;
+package cr;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;

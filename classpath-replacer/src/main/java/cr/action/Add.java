@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * @author Freeman
  */
-public class Add {
+public final class Add {
 
     private final List<String> coordinates = new ArrayList<>();
 

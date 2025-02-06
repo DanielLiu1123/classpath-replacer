@@ -1,12 +1,9 @@
 package cr.action;
 
-import static cr.Verb.ADD;
-import static cr.Verb.EXCLUDE;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import cr.Action;
-import cr.ClasspathReplacer;
+import cr.Classpath;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -15,12 +12,10 @@ import org.junit.jupiter.api.Test;
 class ExcludeTest {
 
     @Test
-    @ClasspathReplacer({
-        @Action(verb = ADD, value = "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.5"),
-        @Action(
-                verb = EXCLUDE,
-                value = "org.springframework:spring-cloud-starter-bootstrap:3.1.5"), // different group id
-    })
+    @Classpath(
+            add = "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.5",
+            exclude = "org.springframework:spring-cloud-starter-bootstrap:3.1.5" // different group id
+            )
     void testKnownIssue_whenMavenProjectHasDifferentGroupId_thenExcludePossibly() {
         // TODO: known issue, shouldn't not exclude when different group id
         assertThrows(ClassNotFoundException.class, () -> {
@@ -29,10 +24,10 @@ class ExcludeTest {
     }
 
     @Test
-    @ClasspathReplacer({
-        @Action(verb = ADD, value = "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.5"),
-        @Action(verb = EXCLUDE, value = "org.spring:spring-cloud-starter-bootstrap:3.1.5"), // different group id
-    })
+    @Classpath(
+            add = "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.5",
+            exclude = "org.spring:spring-cloud-starter-bootstrap:3.1.5" // different group id
+            )
     void notExclude_whenDifferentGroupId() {
         assertDoesNotThrow(() -> {
             Class.forName("org.springframework.cloud.bootstrap.marker.Marker");
@@ -40,10 +35,10 @@ class ExcludeTest {
     }
 
     @Test
-    @ClasspathReplacer({
-        @Action(verb = ADD, value = "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.5"),
-        @Action(verb = EXCLUDE, value = "org.spring:spring-cloud-starter-bootstrap"), // different group id
-    })
+    @Classpath(
+            add = "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.5",
+            exclude = "org.spring:spring-cloud-starter-bootstrap" // different group id
+            )
     void notExclude_whenDifferentGroupIdWithoutVersion() {
         assertDoesNotThrow(() -> {
             Class.forName("org.springframework.cloud.bootstrap.marker.Marker");
@@ -51,12 +46,10 @@ class ExcludeTest {
     }
 
     @Test
-    @ClasspathReplacer(
-            value = {
-                @Action(verb = ADD, value = "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.5"),
-                @Action(verb = EXCLUDE, value = "org.spring:spring-cloud-starter-bootstrap"), // different group id
-            },
-            recursiveExclude = true)
+    @Classpath(
+            add = "org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.5",
+            exclude = "org.spring:spring-cloud-starter-bootstrap", // different group id
+            excludeTransitive = true)
     void notExclude_whenDifferentGroupIdWithRecursiveExclude() {
         assertDoesNotThrow(() -> {
             Class.forName("org.springframework.cloud.bootstrap.marker.Marker");

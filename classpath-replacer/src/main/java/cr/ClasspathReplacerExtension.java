@@ -1,9 +1,5 @@
-package cr.framework.junit5;
+package cr;
 
-import cr.Action;
-import cr.ClasspathReplacer;
-import cr.ModifiedClassPathClassLoader;
-import cr.ModifiedClassPathClassLoaderGenerator;
 import cr.util.ModifiedClassLoaderCache;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -23,7 +19,9 @@ import org.junit.platform.launcher.listeners.TestExecutionSummary;
 
 /**
  * @author Freeman
+ * @deprecated by Freeman since 3.0.0, use {@link ClasspathExtension} instead.
  */
+@Deprecated
 public class ClasspathReplacerExtension implements InvocationInterceptor {
 
     @Override

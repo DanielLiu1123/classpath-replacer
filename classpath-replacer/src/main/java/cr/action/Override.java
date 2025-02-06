@@ -7,8 +7,10 @@ import java.util.List;
 
 /**
  * @author Freeman
+ * @deprecated by Freeman since 3.0.0, use {@link Add} instead.
  */
-public class Override {
+@Deprecated
+public final class Override {
 
     private final List<String> coordinates = new ArrayList<>();
 

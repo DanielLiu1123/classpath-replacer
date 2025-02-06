@@ -1,6 +1,5 @@
 package cr;
 
-import cr.framework.junit5.ClasspathReplacerExtension;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -53,11 +52,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
  *
  * <p> {@link ClasspathReplacer} can be used on the class level or method level, and the method level will override the class level.
  *
+ * @deprecated by Freeman since 3.0.0, use {@link Classpath} instead.
  * @author Freeman
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.METHOD})
 @ExtendWith(ClasspathReplacerExtension.class)
+@Deprecated
 public @interface ClasspathReplacer {
     /**
      * Replace the classpath with the given actions.

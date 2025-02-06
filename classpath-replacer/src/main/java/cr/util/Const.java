@@ -5,7 +5,7 @@ import cr.action.Exclude;
 /**
  * @author Freeman
  */
-public class Const {
+public final class Const {
 
     public static final String JAR_FILE_NAME_PATTERN = "^.+\\.jar$";
 
