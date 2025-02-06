@@ -34,7 +34,7 @@ class RecursiveExcludeTest {
         assertThrows(ClassNotFoundException.class, () -> {
             Class.forName("org.springframework.cloud.bootstrap.marker.Marker");
         });
-        assertThrows(NoClassDefFoundError.class, () -> {
+        assertThrows(ClassNotFoundException.class, () -> {
             Class.forName("org.springframework.boot.SpringApplication");
         });
     }
@@ -48,7 +48,7 @@ class RecursiveExcludeTest {
         assertThrows(ClassNotFoundException.class, () -> {
             Class.forName("org.springframework.cloud.bootstrap.marker.Marker");
         });
-        assertThrows(NoClassDefFoundError.class, () -> {
+        assertThrows(ClassNotFoundException.class, () -> {
             Class.forName("org.springframework.boot.SpringApplication");
         });
     }
@@ -96,7 +96,7 @@ class RecursiveExcludeTest {
         assertThrows(ClassNotFoundException.class, () -> {
             Class.forName("org.springframework.cloud.bootstrap.marker.Marker");
         });
-        assertThrows(NoClassDefFoundError.class, () -> {
+        assertThrows(ClassNotFoundException.class, () -> {
             Class.forName("org.springframework.boot.SpringApplication");
         });
         // If dependencies with different versions have same version dependency, still works perfectly ^_*

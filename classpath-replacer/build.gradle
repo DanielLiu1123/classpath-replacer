@@ -1,15 +1,10 @@
 dependencies {
     api(platform("org.jboss.shrinkwrap.resolver:shrinkwrap-resolver-bom:${shrinkwrapResolversVersion}"))
 
-    api("org.jboss.shrinkwrap.resolver:shrinkwrap-resolver-impl-maven-archive")
+    api("org.jboss.shrinkwrap.resolver:shrinkwrap-resolver-impl-maven")
 
     api("org.junit.jupiter:junit-jupiter")
     api("org.junit.platform:junit-platform-launcher")
-
-    testImplementation("ch.qos.logback:logback-classic:${logbackVersion}") {
-        exclude(group: "org.slf4j", module: "slf4j-api")
-    }
-    testImplementation("org.springframework.boot:spring-boot-starter-test:2.7.5")
 }
 
 apply from: "${rootDir}/gradle/deploy.gradle"
