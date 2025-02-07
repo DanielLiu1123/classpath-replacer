@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 
 /**
- * Static field is not reusable when using {@link ClasspathReplacer}, it will be re-initialized.
+ * Static field is not reusable when using {@link Classpath}, it will be re-initialized.
  *
  * @author Freeman
  */
