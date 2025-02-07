@@ -1,7 +1,7 @@
 dependencies {
-    api(platform("org.jboss.shrinkwrap.resolver:shrinkwrap-resolver-bom:${shrinkwrapResolversVersion}"))
+    api(platform("org.junit:junit-bom:${junitVersion}"))
 
-    api("org.jboss.shrinkwrap.resolver:shrinkwrap-resolver-impl-maven")
+    api("org.jboss.shrinkwrap.resolver:shrinkwrap-resolver-impl-maven:${shrinkwrapResolversVersion}")
 
     api("org.junit.jupiter:junit-jupiter")
     api("org.junit.platform:junit-platform-launcher")
