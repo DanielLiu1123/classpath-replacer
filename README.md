@@ -1,7 +1,7 @@
 # Classpath Replacer
 
 [![Build](https://img.shields.io/github/actions/workflow/status/DanielLiu1123/classpath-replacer/build.yml?branch=main)](https://github.com/DanielLiu1123/classpath-replacer/actions)
-[![Maven Central](https://img.shields.io/maven-central/v/com.freemanan/classpath-replacer-core)](https://search.maven.org/artifact/com.freemanan/classpath-replacer-core)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.danielliu1123/classpath-replacer)](https://search.maven.org/artifact/io.github.danielliu1123/classpath-replacer)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 `Classpath Replacer` is essential for writing unit tests that require different classpath. 
