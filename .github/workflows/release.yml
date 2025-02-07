@@ -9,14 +9,29 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Check out the repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: Check version
+        run: |
+          VERSION_TAG=${{ github.ref_name }}
+          VERSION_TAG=${VERSION_TAG#v}
+          PROJECT_VERSION=$(grep "^version=" gradle.properties | cut -d'=' -f2)
+          if [[ "$PROJECT_VERSION" == "${VERSION_TAG}-SNAPSHOT" ]]; then
+            echo "Version match: tag $VERSION_TAG matches project version $PROJECT_VERSION, proceeding with release"
+          else
+            echo "Version mismatch: tag $VERSION_TAG does not match project version $PROJECT_VERSION"
+            exit 1
+          fi
 
       - name: Set up JDK
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: '8'
-          distribution: 'temurin'
+          distribution: 'corretto'
           cache: 'gradle'
+
+      - name: Build
+        run: ./gradlew build --no-daemon
 
       - name: Decrypt secring.gpg
         run: openssl enc -aes-256-cbc -d -pbkdf2 -in secring.gpg.bin -out secring.gpg -pass pass:${{ secrets.DECRYPT_RING_PASSWORD }}
