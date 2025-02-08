@@ -1,6 +1,5 @@
-package cr.util;
+package cr;
 
-import cr.ModifiedClassPathClassLoader;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
@@ -12,7 +11,7 @@ public final class ModifiedClassLoaderCache {
 
     private static final ConcurrentMap<Class<?>, ModifiedClassPathClassLoader> cache = new ConcurrentHashMap<>();
 
-    public static ModifiedClassPathClassLoader get(Class<?> testClass) {
+    /*private*/ static ModifiedClassPathClassLoader get(Class<?> testClass) {
         return cache.get(testClass);
     }
 
