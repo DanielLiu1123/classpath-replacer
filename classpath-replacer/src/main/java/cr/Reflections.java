@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Copy from Spring Framework.
  */
-class Reflections {
+final class Reflections {
 
     /**
      * Pre-built {@link MethodFilter} that matches all non-bridge non-synthetic methods

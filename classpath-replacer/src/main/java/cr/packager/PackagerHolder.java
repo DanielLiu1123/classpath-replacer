@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * @author Freeman
  */
-public class PackagerHolder {
+public final class PackagerHolder {
 
     private static final List<Packager> packagers = new ArrayList<>();
 
