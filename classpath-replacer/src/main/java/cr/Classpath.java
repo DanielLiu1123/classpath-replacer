@@ -11,7 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
  *
  * <p> Examples:
  *
- * <p> Add the {@code logback-classic} jar and exclude the {@code slf4j-log4j12} and
+ * <p> Add the {@code logback-classic} jar and exclude the {@code slf4j-log4j12}:
  * <pre>{@code
  * @Classpath(
  *     add = "ch.qos.logback:logback-classic:1.4.5",
