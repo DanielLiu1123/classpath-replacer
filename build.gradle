@@ -56,3 +56,5 @@ allprojects {
         omitVisitors.addAll('FindReturnRef', 'DoInsideDoPrivileged')
     }
 }
+
+apply from: "${rootDir}/gradle/jreleaser.gradle"
