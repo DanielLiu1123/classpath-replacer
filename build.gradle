@@ -1,6 +1,7 @@
 plugins {
     id 'com.diffplug.spotless' version "${spotlessVersion}" apply false
     id 'com.github.spotbugs' version "${spotbugsVersion}" apply false
+    id "org.jreleaser" version "${jReleaserVersion}" apply false
 }
 
 allprojects {
@@ -10,8 +11,13 @@ allprojects {
         mavenCentral()
     }
     java {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(8)
+        }
+    }
+    javadoc {
+        // Suppress warnings about missing Javadoc comments
+        options.addStringOption('Xdoclint:none', '-quiet')
     }
     compileJava {
         options.encoding = 'UTF-8'
