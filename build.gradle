@@ -11,9 +11,8 @@ allprojects {
         mavenCentral()
     }
     java {
-        toolchain {
-            languageVersion = JavaLanguageVersion.of(8)
-        }
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     javadoc {
         // Suppress warnings about missing Javadoc comments

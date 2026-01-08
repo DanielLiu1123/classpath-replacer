@@ -1,7 +1,16 @@
 dependencies {
     compileOnly(platform("org.junit:junit-bom:${junitVersion}"))
 
-    api("org.jboss.shrinkwrap.resolver:shrinkwrap-resolver-impl-maven:${shrinkwrapResolversVersion}")
+//    api("org.apache.maven:maven-resolver-provider:${mavenVersion}") {
+//        exclude(group: "org.apache.maven.resolver", module: "maven-resolver-impl")
+//    }
+    api("org.apache.maven.resolver:maven-resolver-impl:${mavenResolverVersion}")
+    api("org.apache.maven.resolver:maven-resolver-connector-basic:${mavenResolverVersion}")
+    api("org.apache.maven.resolver:maven-resolver-supplier-mvn3:${mavenResolverVersion}") {
+        exclude(group: "org.apache.maven.resolver", module: "maven-resolver-impl")
+    }
+    api("org.apache.maven.resolver:maven-resolver-transport-apache:${mavenResolverVersion}")
+    api("org.apache.maven.resolver:maven-resolver-transport-file:${mavenResolverVersion}")
 
     compileOnly("org.junit.jupiter:junit-jupiter")
     compileOnly("org.junit.platform:junit-platform-launcher")
