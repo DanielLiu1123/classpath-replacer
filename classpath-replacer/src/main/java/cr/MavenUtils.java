@@ -31,11 +31,8 @@ import org.eclipse.aether.util.graph.selector.ExclusionDependencySelector;
  * @author Freeman
  */
 final class MavenUtils {
-    private static final int MAX_RESOLUTION_ATTEMPTS = 3;
-    private static final RepositorySystem SYSTEM = new RepositorySystemSupplier().get();
-    // SessionBuilderSupplier is not thread-safe, so access is guarded in newSession().
-    private static final SessionBuilderSupplier SESSION_BUILDER_SUPPLIER = new SessionBuilderSupplier(SYSTEM);
-    private static final Object SESSION_BUILDER_LOCK = new Object();
+    private static final RepositorySystem REPOSITORY_SYSTEM = new RepositorySystemSupplier().get();
+    private static final RepositorySystemSession REPOSITORY_SYSTEM_SESSION = newSession();
     private static final List<RemoteRepository> REPOSITORIES =
             List.of(new RemoteRepository.Builder("central", "default", "https://repo1.maven.org/maven2/").build());
 
@@ -49,56 +46,43 @@ final class MavenUtils {
      * @param coordinate Maven coordinates of the form groupId:artifactId:version
      * @return list of URLs to the resolved artifacts
      */
-    public static List<URL> resolveCoordinate(String coordinate) {
+    public static List<URL> resolveCoordinate(String coordinate) throws Exception {
         if (coordinate == null || coordinate.isEmpty()) {
             throw new IllegalArgumentException("Coordinate cannot be null or empty");
         }
         if (!Pattern.matches(Const.MAVEN_COORDINATE_PATTERN, coordinate)) {
             throw new IllegalArgumentException("Invalid Maven coordinate: " + coordinate);
         }
-        Exception latestFailure = null;
-        for (int i = 0; i < MAX_RESOLUTION_ATTEMPTS; i++) {
-            try (var session = newSession()) {
-                Artifact artifact = new DefaultArtifact(coordinate);
+        Artifact artifact = new DefaultArtifact(coordinate);
 
-                var collectRequest = new CollectRequest();
-                collectRequest.setRoot(new Dependency(artifact, "compile", false, null));
-                collectRequest.setRepositories(REPOSITORIES);
+        var collectRequest = new CollectRequest();
+        collectRequest.setRoot(new Dependency(artifact, "compile", false, null));
+        collectRequest.setRepositories(REPOSITORIES);
 
-                var node = SYSTEM.collectDependencies(session, collectRequest).getRoot();
-                var dependencyRequest = new DependencyRequest(node, (node1, parents) -> {
-                    String scope = node1.getDependency() != null
-                            ? node1.getDependency().getScope()
-                            : null;
-                    return Objects.equals(scope, "compile") || Objects.equals(scope, "runtime");
-                });
-                DependencyResult result = SYSTEM.resolveDependencies(session, dependencyRequest);
+        var node = REPOSITORY_SYSTEM
+                .collectDependencies(REPOSITORY_SYSTEM_SESSION, collectRequest)
+                .getRoot();
+        var dependencyRequest = new DependencyRequest(node, (node1, parents) -> {
+            String scope = node1.getDependency() != null ? node1.getDependency().getScope() : null;
+            return Objects.equals(scope, "compile") || Objects.equals(scope, "runtime");
+        });
+        DependencyResult result = REPOSITORY_SYSTEM.resolveDependencies(REPOSITORY_SYSTEM_SESSION, dependencyRequest);
 
-                List<URL> urls = new ArrayList<>();
-                for (ArtifactResult artifactResult : result.getArtifactResults()) {
-                    urls.add(artifactResult.getArtifact().getPath().toUri().toURL());
-                }
-                return urls;
-            } catch (Exception ex) {
-                latestFailure = ex;
-            }
+        List<URL> urls = new ArrayList<>();
+        for (ArtifactResult artifactResult : result.getArtifactResults()) {
+            urls.add(artifactResult.getArtifact().getPath().toUri().toURL());
         }
-        throw new IllegalStateException(
-                "Resolution failed after " + MAX_RESOLUTION_ATTEMPTS + " attempts", latestFailure);
+        return urls;
     }
 
-    private static RepositorySystemSession.CloseableSession newSession() {
-        RepositorySystemSession.SessionBuilder sessionBuilder;
-        synchronized (SESSION_BUILDER_LOCK) {
-            sessionBuilder = SESSION_BUILDER_SUPPLIER.get();
-        }
-        sessionBuilder
-                .setDependencySelector(new AndDependencySelector(
+    private static RepositorySystemSession newSession() {
+        var builder = new SessionBuilderSupplier(REPOSITORY_SYSTEM).get();
+        builder.setDependencySelector(new AndDependencySelector(
                         ScopeDependencySelector.fromRoot(List.of("compile", "runtime"), List.of("test", "provided")),
                         OptionalDependencySelector.fromRoot(),
                         new ExclusionDependencySelector()))
                 .withLocalRepositories(new LocalRepository(resolveLocalRepositoryPath()));
-        return sessionBuilder.build();
+        return builder.build();
     }
 
     private static Path resolveLocalRepositoryPath() {
